@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Penjualan Sempol</title>
+</head>
+<body>
+    <h1>Penjualan Sempol</h1>
+    <form method="POST" action="/add_sale">
+        Harga Sempol: <input type="number" name="harga" step="0.01" required>
+        <button type="submit">Catat Penjualan</button>
+    </form>
+    <h2>Data Penjualan Sempol:</h2>
+    <ul>
+        {% for sale in sempol_data %}
+            <li>{{ sale.waktu }} - Harga: {{ sale.harga }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
