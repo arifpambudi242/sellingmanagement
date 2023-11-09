@@ -2,18 +2,35 @@
 <html>
 <head>
     <title>Penjualan Sempol</title>
+    <!-- Hubungkan Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <style>
+        /* Menambahkan sedikit gaya kustom */
+        body {
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Penjualan Sempol</h1>
-    <form method="POST" action="/add_sale">
-        Harga Sempol: <input type="number" name="harga" step="0.01" required>
-        <button type="submit">Catat Penjualan</button>
-    </form>
-    <h2>Data Penjualan Sempol:</h2>
-    <ul>
-        {% for sale in sempol_data %}
-            <li>{{ sale.waktu }} - Harga: {{ sale.harga }}</li>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <h1 class="display-4">Penjualan Sempol</h1>
+        <form method="POST" action="/add_sale" class="mb-3">
+            <div class="input-group">
+                <input type="number" name="harga" step="0.01" class="form-control" required>
+                <button type="submit" class="btn btn-primary">Catat Penjualan</button>
+            </div>
+        </form>
+        <h2 class="mt-4">Data Penjualan Sempol:</h2>
+        <ul class="list-group">
+            {% for sale in sempol_data %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ sale.waktu }} - Harga: {{ sale.harga }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Hubungkan Bootstrap JavaScript (pilihan) jika Anda ingin menggunakan komponen interaktif Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

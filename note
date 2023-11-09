@@ -1,0 +1,12 @@
+usage example 
+new_user = User(username='john_doe', email='john@example.com', password='password123')
+db.session.add(new_user)
+db.session.commit()
+
+usage example verify password
+
+user = User.query.filter_by(username='john_doe').first()
+if user and user.check_password('password123'):
+    # User is authenticated
+else:
+    # Invalid username or password
