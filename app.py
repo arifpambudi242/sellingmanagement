@@ -4,6 +4,7 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, session
 import dotenv
 import os
+from datetime import datetime
 from flask_bcrypt import Bcrypt
 
 bcrypt = Bcrypt()
@@ -47,7 +48,10 @@ class User(db.Model):
 @app.route('/')
 def index():
     sempol_data = Sempol.query.all()
-    return render_template('index.html', sempol_data=sempol_data)
+    prices = 0
+    for sempol in sempol_data:
+        prices += sempol.harga
+    return render_template('index.html', data={'prices' : prices,'sempol_data' : sempol_data}, convert_date=convert_date, str_convert=str_convert)
 
 @app.route('/add_sale', methods=['POST'])
 def add_sale():
@@ -57,6 +61,23 @@ def add_sale():
     db.session.add(sempol)
     db.session.commit()
     return redirect(url_for('index'))
+
+def convert_date(datestr):
+
+    # Given datetime string
+    datetime_str = datestr
+
+    # Convert string to datetime object
+    datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S.%f")
+
+    # Format the datetime object
+    formatted_datetime = datetime_obj.strftime("%A, %d %b %Y %H:%M")
+
+    return formatted_datetime
+
+def str_convert(strin):
+    return f'{strin}'
+
 
 if __name__ == '__main__':
     with app.app_context():

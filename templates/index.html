@@ -22,11 +22,14 @@
         </form>
         <h2 class="mt-4">Data Penjualan Sempol:</h2>
         <ul class="list-group">
-            {% for sale in sempol_data %}
+            {% for sale in data.sempol_data %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ sale.waktu }} - Harga: {{ sale.harga }}
+                    {{ convert_date(str_convert(sale.waktu)) }} - Harga: {{ 'Rp. {:,.0f}'.format(sale.harga) }}
                 </li>
-            {% endfor %}
+                {% endfor %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Total Harga: {{ 'Rp. {:,.0f}'.format(data.prices) }}
+                </li>
         </ul>
     </div>
 
