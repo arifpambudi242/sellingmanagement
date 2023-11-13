@@ -28,13 +28,65 @@ class Sempol(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     harga = db.Column(db.Float)
     waktu = db.Column(db.DateTime, default=datetime.now)
-    # Tambahkan kolom lain sesuai kebutuhan
-class User(db.Model):
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+class Modal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nama = db.Column(db.String(255), nullable=False)
+    jumlah = db.Column(db.Float, nullable=False)
+    keterangan = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+class Belanja(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nama = db.Column(db.String(255), nullable=False)
+    id_modal = db.Column(db.Integer, db.ForeignKey('modal.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    
+    modal = db.relationship('Modal', backref=db.backref('Belanja', lazy=True))
+
+class Produksi(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_belanja = db.Column(db.Integer, db.ForeignKey('belanja.id'), nullable=False)
+    jumlah_produksi = db.Column(db.Float, nullable=False)
+    tanggal_produksi = db.Column(db.Date, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    belanja = db.relationship('Belanja', backref=db.backref('Produksi', lazy=True))
+
+class HargaJual(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    harga = db.Column(db.Float, nullable=False)
+    tgl_berlaku = db.Column(db.Date, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+
+class Jual(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_produksi = db.Column(db.Integer, db.ForeignKey('produksi.id'), nullable=False)
+    id_harga = db.Column(db.Integer, db.ForeignKey('harga_jual.id'), nullable=False)
+    jumlah_penjualan = db.Column(db.Float, nullable=False)
+    tanggal_penjualan = db.Column(db.Date, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    produksi = db.relationship('Produksi', backref=db.backref('Jual', lazy=True))
+    harga_jual = db.relationship('HargaJual', backref=db.backref('Jual', lazy=True))
+
+
+
+class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, username, email, password):
         self.username = username
