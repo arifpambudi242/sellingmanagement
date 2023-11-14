@@ -176,7 +176,7 @@ def belanja():
 
 @app.route('/modal')
 def modal():
-    return "Ini adalah halaman Modal"
+    return render_template('modal.html')
 
 @app.route('/harga_jual')
 def harga_jual():
