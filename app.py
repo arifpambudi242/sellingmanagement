@@ -113,6 +113,38 @@ def str_convert(strin):
     return f'{strin}'
 
 
+
+@app.context_processor
+def inject_data():
+    tahun_sekarang = datetime.now().year
+    tahun = 2023
+
+    if tahun < tahun_sekarang:
+        tahun_str = f"{tahun} - {tahun_sekarang}"
+    else:
+        tahun_str = str(tahun)
+
+    active_menu = request.endpoint  # Assuming endpoint names match your menu names
+    menus = {
+        'index' : 'Home',
+        'produksi' : 'Produksi',
+        'belanja' : 'Belanja',
+        'modal' : 'Modal',
+        'harga_jual' : 'Harga Jual',
+    }
+    active_title = ''
+
+    for key, menu in menus.items():
+        if active_menu in key:
+            active_title = menu
+            break
+        else:
+            active_title = ''
+            continue
+
+
+    return dict(tahun=tahun_str, active_title=active_title)
+
 @app.route('/')
 def index():
     sempol_data = Sempol.query.all()
