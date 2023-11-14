@@ -154,8 +154,15 @@ def inject_data():
     datas = None
     for key, table in tables.items():
         if active_menu in key:
-            datas = table.query.all()
-            break
+            if type(table) is not list:
+                datas = table.query.all()
+                break
+            else:
+                datas = {}
+                for tab in table:
+                    print(tab.__name__.lower())
+                    datas[tab.__name__.lower()] = tab.query.all()
+                break
         else:
             datas = None
             continue

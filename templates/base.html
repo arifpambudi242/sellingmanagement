@@ -225,6 +225,11 @@
   <script src="{{ url_for('static', filename='dist/js/adminlte.min.js') }}"></script>
 
   <script src="{{ url_for('static', filename='dist/js/app.js') }}"></script>
+  
+  <script src="{{ url_for('static', filename='plugins/chart.js/Chart.min.js') }}"></script>
+  {%if active_title.lower() == 'home' %}
+  <script src="{{ url_for('static', filename='dist/js/index.js') }}"></script>
+  {% endif%}
 </body>
 
 </html>
