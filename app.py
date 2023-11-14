@@ -96,6 +96,22 @@ class Users(db.Model):
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
 
+def convert_date(datestr):
+
+    # Given datetime string
+    datetime_str = datestr
+
+    # Convert string to datetime object
+    datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S.%f")
+
+    # Format the datetime object
+    formatted_datetime = datetime_obj.strftime("%A, %d %b %Y %H:%M")
+
+    return formatted_datetime
+
+def str_convert(strin):
+    return f'{strin}'
+
 
 @app.route('/')
 def index():
@@ -114,21 +130,21 @@ def add_sale():
     db.session.commit()
     return redirect(url_for('index'))
 
-def convert_date(datestr):
+@app.route('/produksi')
+def produksi():
+    return "Ini adalah halaman Produksi"
 
-    # Given datetime string
-    datetime_str = datestr
+@app.route('/belanja')
+def belanja():
+    return "Ini adalah halaman Belanja"
 
-    # Convert string to datetime object
-    datetime_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S.%f")
+@app.route('/modal')
+def modal():
+    return "Ini adalah halaman Modal"
 
-    # Format the datetime object
-    formatted_datetime = datetime_obj.strftime("%A, %d %b %Y %H:%M")
-
-    return formatted_datetime
-
-def str_convert(strin):
-    return f'{strin}'
+@app.route('/harga_jual')
+def harga_jual():
+    return "Ini adalah halaman Harga Jual"
 
 
 if __name__ == '__main__':
