@@ -162,6 +162,10 @@ def add_sale():
     db.session.commit()
     return redirect(url_for('index'))
 
+@app.route('/penjualan')
+def penjualan():
+    return "Ini adalah halaman Penjualan"
+
 @app.route('/produksi')
 def produksi():
     return "Ini adalah halaman Produksi"
