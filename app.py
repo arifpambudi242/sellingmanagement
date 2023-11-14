@@ -27,24 +27,24 @@ db = SQLAlchemy(app)
 class Sempol(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     harga = db.Column(db.Float)
-    waktu = db.Column(db.DateTime, default=datetime.now)
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    waktu = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
 class Modal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(255), nullable=False)
     jumlah = db.Column(db.Float, nullable=False)
     keterangan = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
 class Belanja(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(255), nullable=False)
     id_modal = db.Column(db.Integer, db.ForeignKey('modal.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
     
     modal = db.relationship('Modal', backref=db.backref('Belanja', lazy=True))
 
@@ -53,8 +53,8 @@ class Produksi(db.Model):
     id_belanja = db.Column(db.Integer, db.ForeignKey('belanja.id'), nullable=False)
     jumlah_produksi = db.Column(db.Float, nullable=False)
     tanggal_produksi = db.Column(db.Date, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
     belanja = db.relationship('Belanja', backref=db.backref('Produksi', lazy=True))
 
@@ -62,8 +62,8 @@ class HargaJual(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     harga = db.Column(db.Float, nullable=False)
     tgl_berlaku = db.Column(db.Date, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
 
 class Jual(db.Model):
@@ -72,8 +72,8 @@ class Jual(db.Model):
     id_harga = db.Column(db.Integer, db.ForeignKey('harga_jual.id'), nullable=False)
     jumlah_penjualan = db.Column(db.Float, nullable=False)
     tanggal_penjualan = db.Column(db.Date, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
     produksi = db.relationship('Produksi', backref=db.backref('Jual', lazy=True))
     harga_jual = db.relationship('HargaJual', backref=db.backref('Jual', lazy=True))
@@ -85,8 +85,8 @@ class Users(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
     def __init__(self, username, email, password):
         self.username = username
@@ -127,12 +127,22 @@ def inject_data():
     active_menu = request.endpoint  # Assuming endpoint names match your menu names
     menus = {
         'index' : 'Home',
+        'penjualan' : 'Penjualan',
         'produksi' : 'Produksi',
         'belanja' : 'Belanja',
         'modal' : 'Modal',
         'harga_jual' : 'Harga Jual',
     }
     active_title = ''
+    
+    tables = {
+        'index' : [Modal, Belanja, Produksi, HargaJual, Jual],
+        'penjualan' : Jual,
+        'produksi' : Produksi,
+        'belanja' : Belanja,
+        'modal' : Modal,
+        'harga_jual' : HargaJual,
+    }
 
     for key, menu in menus.items():
         if active_menu in key:
@@ -141,9 +151,17 @@ def inject_data():
         else:
             active_title = ''
             continue
+    datas = None
+    for key, table in tables.items():
+        if active_menu in key:
+            datas = table.query.all()
+            break
+        else:
+            datas = None
+            continue
+    no = 0
 
-
-    return dict(tahun=tahun_str, active_title=active_title)
+    return dict(tahun=tahun_str, active_title=active_title, datas=datas, no=no)
 
 @app.route('/')
 def index():
@@ -161,6 +179,18 @@ def add_sale():
     db.session.add(sempol)
     db.session.commit()
     return redirect(url_for('index'))
+
+@app.route('/add_modal', methods=['POST'])
+def add_modal():
+    nama = request.form.get('nama')
+    jumlah = request.form.get('jumlah')
+    keterangan = request.form.get('keterangan')
+    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
+    modal = Modal(nama=nama, jumlah=jumlah, keterangan=keterangan)
+    db.session.add(modal)
+    db.session.commit()
+    return redirect(url_for('modal'))
+
 
 @app.route('/penjualan')
 def penjualan():

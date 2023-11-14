@@ -10,13 +10,13 @@
 (function ($) {
   'use strict'
 
-  setTimeout(function () {
-    if (window.___browserSync___ === undefined && Number(localStorage.getItem('AdminLTE:Demo:MessageShowed')) < Date.now()) {
-      localStorage.setItem('AdminLTE:Demo:MessageShowed', (Date.now()) + (15 * 60 * 1000))
-      // eslint-disable-next-line no-alert
-      alert('You load AdminLTE\'s "demo.js", \nthis file is only created for testing purposes!')
-    }
-  }, 1000)
+  // setTimeout(function () {
+  //   if (window.___browserSync___ === undefined && Number(localStorage.getItem('AdminLTE:Demo:MessageShowed')) < Date.now()) {
+  //     localStorage.setItem('AdminLTE:Demo:MessageShowed', (Date.now()) + (15 * 60 * 1000))
+  //     // eslint-disable-next-line no-alert
+  //     alert('You load AdminLTE\'s "demo.js", \nthis file is only created for testing purposes!')
+  //   }
+  // }, 1000)
 
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1)
@@ -686,4 +686,83 @@
     $brand_variants.find('option.' + active_brand_color).prop('selected', true)
     $brand_variants.removeClass().addClass('custom-select mb-3 text-light border-0 ').addClass(active_brand_color)
   }
+  // $("#pretty-table").DataTable({
+  //   "responsive": true, "lengthChange": false, "autoWidth": false,
+  //   "buttons": ["copy", "csv", "excel", "pdf", "print"],
+  //   "lengthMenu": [10, 20, 50, 100, -1], // -1 for "All" entries
+  //   "pageLength": 10 // Default page length
+  // }).buttons().container().appendTo('#pretty-table_wrapper .col-md-6:eq(0)');
+
+  var table = $('#pretty-table').DataTable({
+    "responsive": true,
+    "autoWidth": false,
+    "language": {
+      "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+      "infoEmpty": "Tidak ada data yang ditampilkan",
+      "infoFiltered": "(filter dari _MAX_ total entri)",
+      "lengthMenu": "Tampilkan _MENU_ entri",
+      "search": "Cari:",
+      "paginate": {
+        "first": "Pertama",
+        "last": "Terakhir",
+        "next": "Selanjutnya",
+        "previous": "Sebelumnya"
+      }
+    },
+    "lengthMenu": [
+      10,
+      20,
+      50,
+      100,
+      [-1, 'Semua'] // Custom label for "All" option
+    ],
+    "pageLength": 10, // Default page length
+    "buttons": [
+      'pdf', 'excel', 'print'
+    ],
+
+  }).buttons().container().appendTo('#pretty-table_wrapper .col-md-6:eq(0)');
+  
+  table.on('buttons-action', function (e, buttonApi, dataTable, node, config) {
+    if (buttonApi.text() === 'Copy' || buttonApi.text() === 'Excel' || buttonApi.text() === 'PDF' || buttonApi.text() === 'Print') {
+      var lastColumnIndex = table.columns().indexes().length - 1;
+      table.column(lastColumnIndex).visible(true);
+    }
+  });
+
+  $('.modal').on('shown.bs.modal', function () {
+    $(this).find('input:first').focus();
+  });
+  $('.modal').on('hide.bs.modal', function (e) {
+    if (!$(this).find('input:first').val() == ''){
+      if (!confirm('Apakah Anda yakin ingin menutup? inputan anda tidak disimpan')) {
+        e.preventDefault();
+      }
+    }
+  });
+  $('.modal form').submit(function (event) {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    // Serialize the form data
+    var formData = $(this).serialize();
+
+    // Send an AJAX request to the server
+    $.ajax({
+        type: 'POST',
+        url: $(this).prop('action'),
+        data: formData,
+        success: function (response) {
+            // Handle the success response
+            $(':input').val('');
+            toastr.success('Data berhasil ditambahkan');
+            $('table').load(window.location.href + ' table');
+        },
+        error: function (error) {
+            // Handle the error response
+            console.error('Error submitting data:', error);
+            // You can perform additional error handling here if needed
+        }
+    });
+});
 })(jQuery)
