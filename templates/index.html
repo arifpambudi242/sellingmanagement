@@ -88,11 +88,21 @@
                 </div>
                 <!-- /.card -->
 
-                
+
             </div>
             <!-- /.col-md-6 -->
         </div>
         <!-- /.row -->
+        <di class="row">
+            <div class="col-lg-12">
+                {% for key, data in datas.items() %}
+                {% for data in data %}
+                    {{data}}
+                    
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </di>
     </div>
     <!-- /.container-fluid -->
 </div>

@@ -33,10 +33,11 @@
                             <td>{{data.keterangan}}</td>
                             <td>{{data.created_at}}</td>
                             <td>{{data.updated_at}}</td>
-                            <td><button class="btn-sm btn-primary"> <i class="fas fa-edit"></i> </button> <button class="btn-sm btn-danger"> <i class="fas fa-eraser"></i> </button></td>
+                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit" data-link="{{ url_for('edit_modal', modal_id=data.id) }}"> <i class="fas fa-edit"></i> </button> 
+                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete" data-link="{{ url_for('delete_modal', modal_id=data.id) }}" data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button></td>
                         </tr>
                         {% endfor %}
-                        
+
                     </tbody>
                     <tfoot>
                         <tr>
@@ -57,32 +58,34 @@
     <!-- /.container-fluid -->
 </div>
 <!-- Modal -->
-<div class="modal fade" id="inputModal" tabindex="-1" role="dialog" aria-labelledby="inputModalLabel"
+<div class="modal fade modal-input" id="inputModal" tabindex="-1" role="dialog" aria-labelledby="inputModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="inputModalLabel">Input Data</h5>
+                <h5 class="modal-title" id="inputModalLabel">Tambah Data Modal</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/add_modal", method="post">
+                <form action="/add_modal" , method="post">
                     <div class="form-group">
                         <label for="nama">Nama</label>
-                        <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama" required>
+                        <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama"
+                            required>
                     </div>
                     <div class="form-group">
                         <label for="jumlah">Jumlah</label>
-                        <input type="number" class="form-control" id="jumlah" name="jumlah" placeholder="Masukkan Jumlah" required>
+                        <input type="number" class="form-control" id="jumlah" name="jumlah"
+                            placeholder="Masukkan Jumlah" required>
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Masukkan Keterangan"
-                            required>
+                        <input type="text" class="form-control" id="keterangan" name="keterangan"
+                            placeholder="Masukkan Keterangan" required>
                     </div>
-                    <button type="submit" class="btn btn-primary float-right">Simpan</button>
+                    <button type="submit" class="btn btn-primary float-right" data-saved="0">Simpan</button>
                     <button type="button" class="btn btn-danger float-right" data-dismiss="modal" aria-label="Close">
                         Tutup
                     </button>
@@ -91,4 +94,41 @@
         </div>
     </div>
 </div>
+<div class="modal fade modal-edit" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Data Modal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/edit_modal" , method="post">
+                    <div class="form-group">
+                        <label for="nama">Nama</label>
+                        <input type="text" class="form-control" id="edit-nama" name="nama" placeholder="Masukkan Nama"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jumlah">Jumlah</label>
+                        <input type="number" class="form-control" id="edit-jumlah" name="jumlah"
+                            placeholder="Masukkan Jumlah" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="keterangan">Keterangan</label>
+                        <input type="text" class="form-control" id="edit-keterangan" name="keterangan"
+                            placeholder="Masukkan Keterangan" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary float-right" data-saved="0">Simpan</button>
+                    <button type="button" class="btn btn-danger float-right" data-dismiss="modal" aria-label="Close">
+                        Tutup
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
 {% endblock %}

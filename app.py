@@ -187,16 +187,6 @@ def add_sale():
     db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/add_modal', methods=['POST'])
-def add_modal():
-    nama = request.form.get('nama')
-    jumlah = request.form.get('jumlah')
-    keterangan = request.form.get('keterangan')
-    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
-    modal = Modal(nama=nama, jumlah=jumlah, keterangan=keterangan)
-    db.session.add(modal)
-    db.session.commit()
-    return redirect(url_for('modal'))
 
 
 @app.route('/penjualan')
@@ -211,9 +201,60 @@ def produksi():
 def belanja():
     return "Ini adalah halaman Belanja"
 
+# modal
 @app.route('/modal')
 def modal():
     return render_template('modal.html')
+
+@app.route('/add_modal', methods=['POST'])
+def add_modal():
+    nama = request.form.get('nama')
+    jumlah = request.form.get('jumlah')
+    keterangan = request.form.get('keterangan')
+    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
+    modal = Modal(nama=nama, jumlah=jumlah, keterangan=keterangan)
+    db.session.add(modal)
+    db.session.commit()
+    return redirect(url_for('modal'))
+
+@app.route('/delete_modal/<int:modal_id>', methods=['POST'])
+def delete_modal(modal_id):
+    modal = Modal.query.get(modal_id)
+    if modal:
+        db.session.delete(modal)
+        db.session.commit()
+    return redirect(url_for('modal'))
+
+@app.route('/edit_modal/<int:modal_id>', methods=['GET','POST'])
+def edit_modal(modal_id):
+    if not request.method == 'POST':
+        modal = Modal.query.get(modal_id)
+
+        if modal:
+            # If the modal with the given ID exists, return its data
+            return jsonify({'id': modal.id, 'nama': modal.nama, 'jumlah' : modal.jumlah, 'keterangan' : modal.keterangan})
+        else:
+            # If the modal with the given ID does not exist, return an error message
+            return jsonify({'error': 'Modal not found'}), 404
+    else:
+        modal = Modal.query.get(modal_id)
+        if modal:
+            # Get the updated data from the request
+            updated_data = request.form
+
+            # Update the modal with the new data
+            modal.nama = updated_data.get('nama', modal.nama)
+            modal.jumlah = updated_data.get('jumlah', modal.jumlah)
+            modal.keterangan = updated_data.get('keterangan', modal.keterangan)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            return jsonify({'message': 'Modal updated successfully'})
+        else:
+            return jsonify({'error': 'Modal not found'}), 404
+
+# end modal
 
 @app.route('/harga_jual')
 def harga_jual():

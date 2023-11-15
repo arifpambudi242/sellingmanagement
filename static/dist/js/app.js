@@ -693,7 +693,7 @@
   //   "pageLength": 10 // Default page length
   // }).buttons().container().appendTo('#pretty-table_wrapper .col-md-6:eq(0)');
   var doc_title = $('h1').text();
-  function current_date(){
+  function current_date() {
     // Create a Date object
     const date = new Date();
 
@@ -773,7 +773,7 @@
     $(this).find('input:first').focus();
   });
   $('.modal').on('hide.bs.modal', function (e) {
-    if (!$(this).find('input:first').val() == '') {
+    if ($(this).find('button[type="submit"]').data('saved') == '0') {
       if (!confirm('Apakah Anda yakin ingin menutup? inputan anda tidak disimpan')) {
         e.preventDefault();
       }
@@ -782,7 +782,7 @@
       location.reload();
     }
   });
-  $('.modal form').submit(function (event) {
+  $('.modal-input form').submit(function (event) {
     // Prevent the default form submission
     event.preventDefault();
 
@@ -800,6 +800,76 @@
           $(':input').val('');
           toastr.success('Data berhasil ditambahkan');
           $('table').load(window.location.href + ' table');
+          $('button[type="submit"]').data('saved', 1);
+        },
+        error: function (error) {
+          // Handle the error response
+          console.error('Error submitting data:', error);
+          // You can perform additional error handling here if needed
+        }
+      });
+    }
+  });
+
+  $('.btn-delete').click(function () {
+
+    if (confirm('Yakin akan menghapus data?')) {// Send an AJAX request to delete the modal
+      $.ajax({
+        url: $(this).data('link'),
+        type: "POST",
+        success: function (response) {
+          toastr.success('Data berhasil dihapus');
+          $('table').load(window.location.href + ' table');
+          setTimeout(function () {
+            location.reload(); // Reload the page for simplicity
+          }, 1500);
+        },
+        error: function (error) {
+          // Handle the error (if needed)
+          console.error("Error deleting modal:", error);
+        }
+      });
+    }
+  });
+
+  $('.btn-edit').click(function (e) {
+    var action_link = $(this).data('link');
+    $.ajax({
+      url: action_link,
+      type: "GET",
+      success: function (response) {
+        $('.modal-edit form').prop('action', action_link);
+        $.each(response, function (key, value) {
+          // Find the input element with the corresponding name
+          $(`#edit-${key}`).val(value);
+
+        });
+        $('.modal-edit').modal("show");
+      },
+      error: function (error) {
+        // Handle the error (if needed)
+        console.error("Error deleting modal:", error);
+      }
+    });
+  });
+  $('.modal-edit form').submit(function (event) {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    if (confirm('Yakin akan menyimpan?')) {
+      // Serialize the form data
+      var formData = $(this).serialize();
+
+      // Send an AJAX request to the server
+      $.ajax({
+        type: 'POST',
+        url: $(this).prop('action'),
+        data: formData,
+        success: function (response) {
+          // Handle the success response
+          toastr.success('Data berhasil ditambahkan');
+          $('table').load(window.location.href + ' table');
+          $('button[type="submit"]').data('saved', 1);
         },
         error: function (error) {
           // Handle the error response
