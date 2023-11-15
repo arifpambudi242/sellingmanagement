@@ -776,9 +776,11 @@
     if ($(this).find('button[type="submit"]').data('saved') == '0') {
       if (!confirm('Apakah Anda yakin ingin menutup? inputan anda tidak disimpan')) {
         e.preventDefault();
+        $('.formattedValue').remove();
       }
     }
     else {
+      $('.formattedValue').remove();
       location.reload();
     }
   });
@@ -818,11 +820,11 @@
         url: $(this).data('link'),
         type: "POST",
         success: function (response) {
-          toastr.success('Data berhasil dihapus');
+          toastr.success('Data berhasil dihapus\nreloading......');
           $('table').load(window.location.href + ' table');
           setTimeout(function () {
             location.reload(); // Reload the page for simplicity
-          }, 1500);
+          }, 1000);
         },
         error: function (error) {
           // Handle the error (if needed)
@@ -879,4 +881,40 @@
       });
     }
   });
+
+  // Get the input element with type="number"
+
+
+  $('input[type="number"]').before('<span class="formattedValue"></span>');
+  // Add focus event listener
+  $('input[type="number"]').on('focus', function () {
+    var parent = $(this).parent();
+    var formattedValueSpan = parent.find('.formattedValue');
+    var inputValue = parseFloat($(this).val());
+    var formattedValue = isNaN(inputValue) ? '' : formatCurrency(inputValue);
+    formattedValueSpan.text(formattedValue);
+  });
+  
+  // Add input event listener
+  $('[type="number"]').on('input', function () {
+    var parent = $(this).parent();
+    var formattedValueSpan = parent.find('.formattedValue');
+    var inputValue = parseFloat($(this).val());
+    var formattedValue = isNaN(inputValue) ? '' : formatCurrency(inputValue);
+    formattedValueSpan.text(formattedValue);
+  });
+ 
+  // Add blur event listener to remove the span
+
+  // Function to format currency
+  function formatCurrency(value) {
+    // Format the value as currency (assuming Indonesian Rupiah)
+    var formattedValue = value.toLocaleString('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 2
+    });
+
+    return formattedValue;
+  }
 })(jQuery)

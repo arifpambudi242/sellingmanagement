@@ -43,16 +43,31 @@ class Belanja(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(255), nullable=False)
     id_modal = db.Column(db.Integer, db.ForeignKey('modal.id'), nullable=False)
+    keterangan = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
     
     modal = db.relationship('Modal', backref=db.backref('Belanja', lazy=True))
+
+class BelanjaRinci(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nama_barang = db.Column(db.String(255), nullable=False)
+    harga = db.Column(db.Float, nullable=False)
+    jumlah = db.Column(db.Integer, nullable=False)
+    belanja_id = db.Column(db.Integer, db.ForeignKey('belanja.id'), nullable=False)
+    keterangan = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+
+    belanja = db.relationship('Belanja', backref=db.backref('belanja_rinci', lazy=True))
+
 
 class Produksi(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_belanja = db.Column(db.Integer, db.ForeignKey('belanja.id'), nullable=False)
     jumlah_produksi = db.Column(db.Float, nullable=False)
     tanggal_produksi = db.Column(db.Date, nullable=False)
+    keterangan = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
@@ -62,6 +77,7 @@ class HargaJual(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     harga = db.Column(db.Float, nullable=False)
     tgl_berlaku = db.Column(db.Date, nullable=False)
+    keterangan = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
@@ -72,6 +88,7 @@ class Jual(db.Model):
     id_harga = db.Column(db.Integer, db.ForeignKey('harga_jual.id'), nullable=False)
     jumlah_penjualan = db.Column(db.Float, nullable=False)
     tanggal_penjualan = db.Column(db.Date, nullable=False)
+    keterangan = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
@@ -196,11 +213,11 @@ def penjualan():
 @app.route('/produksi')
 def produksi():
     return "Ini adalah halaman Produksi"
-
+# belanja
 @app.route('/belanja')
 def belanja():
-    return "Ini adalah halaman Belanja"
-
+    return render_template('belanja.html')
+# end belanja
 # modal
 @app.route('/modal')
 def modal():
