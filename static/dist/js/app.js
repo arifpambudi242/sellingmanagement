@@ -737,7 +737,7 @@
       {
         extend: 'csv',
         text: 'CSV',
-        title: 'Laporan ' + doc_title + current_date(),
+        title: 'Laporan ' + doc_title + ' ' + current_date(),
         exportOptions: {
           columns: ':not(:last-child)'
         }
@@ -745,7 +745,7 @@
       {
         extend: 'excel',
         text: 'Excel',
-        title: 'Laporan ' + doc_title + current_date(),
+        title: 'Laporan ' + doc_title + ' ' + current_date(),
         exportOptions: {
           columns: ':not(:last-child)'
         }
@@ -753,7 +753,7 @@
       {
         extend: 'pdf',
         text: 'PDF',
-        title: 'Laporan ' + doc_title + current_date(),
+        title: 'Laporan ' + doc_title + ' ' + current_date(),
         exportOptions: {
           columns: ':not(:last-child)'
         }
@@ -761,7 +761,7 @@
       {
         extend: 'print',
         text: 'Print',
-        title: 'Laporan ' + doc_title + current_date(),
+        title: 'Laporan ' + doc_title + ' ' + current_date(),
         exportOptions: {
           columns: ':not(:last-child)'
         }
