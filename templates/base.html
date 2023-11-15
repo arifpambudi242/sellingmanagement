@@ -115,37 +115,37 @@
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
-              <a href="{{url_for('index')}}" class="nav-link">
+              <a href="{{url_for('index')}}" class="nav-link {% if active_title.lower() == 'home' %} active {% endif %}">
                 <i class="nav-icon fas fa-home"></i>
                 <p>Home</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{url_for('penjualan')}}" class="nav-link">
+              <a href="{{url_for('penjualan')}}" class="nav-link {% if 'penjualan' in active_title.lower() %} active {% endif %}">
                 <i class="nav-icon far fa-chart-bar"></i>
                 <p>Penjualan</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{url_for('harga_jual')}}" class="nav-link">
+              <a href="{{url_for('harga_jual')}}" class="nav-link {% if 'harga jual' in active_title.lower() %} active {% endif %}">
                 <i class="nav-icon fas fa-tag"></i>
                 <p>Harga Jual</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{url_for('produksi')}}" class="nav-link">
+              <a href="{{url_for('produksi')}}" class="nav-link {% if 'produksi' in active_title.lower() %} active {% endif %}">
                 <i class="nav-icon fas fa-industry"></i>
                 <p>Produksi</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{url_for('belanja')}}" class="nav-link">
+              <a href="{{url_for('belanja')}}" class="nav-link {% if 'belanja' in active_title.lower() %} active {% endif %}">
                 <i class="nav-icon fas fa-shopping-cart"></i>
                 <p>Belanja</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{url_for('modal')}}" class="nav-link">
+              <a href="{{url_for('modal')}}" class="nav-link {% if 'modal' in active_title.lower() %} active {% endif %}">
                 <i class="nav-icon fas fa-dollar-sign"></i>
                 <p>Modal</p>
               </a>

@@ -692,7 +692,23 @@
   //   "lengthMenu": [10, 20, 50, 100, -1], // -1 for "All" entries
   //   "pageLength": 10 // Default page length
   // }).buttons().container().appendTo('#pretty-table_wrapper .col-md-6:eq(0)');
+  var doc_title = $('h1').text();
+  function current_date(){
+    // Create a Date object
+    const date = new Date();
 
+    // Extract date components
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const year = date.getFullYear();
+    const hours = ('0' + date.getHours()).slice(-2);
+    const minutes = ('0' + date.getMinutes()).slice(-2);
+
+    // Create the formatted date string
+    const formattedDate = `${day}.${month}.${year} ${hours}.${minutes}`;
+
+    return formattedDate;
+  }
   var table = $('#pretty-table').DataTable({
     "responsive": true,
     "autoWidth": false,
@@ -717,52 +733,80 @@
       [-1, 'Semua'] // Custom label for "All" option
     ],
     "pageLength": 10, // Default page length
-    "buttons": [
-      'pdf', 'excel', 'print'
-    ],
-
+    'buttons': [
+      {
+        extend: 'csv',
+        text: 'CSV',
+        title: 'Laporan ' + doc_title + current_date(),
+        exportOptions: {
+          columns: ':not(:last-child)'
+        }
+      },
+      {
+        extend: 'excel',
+        text: 'Excel',
+        title: 'Laporan ' + doc_title + current_date(),
+        exportOptions: {
+          columns: ':not(:last-child)'
+        }
+      },
+      {
+        extend: 'pdf',
+        text: 'PDF',
+        title: 'Laporan ' + doc_title + current_date(),
+        exportOptions: {
+          columns: ':not(:last-child)'
+        }
+      },
+      {
+        extend: 'print',
+        text: 'Print',
+        title: 'Laporan ' + doc_title + current_date(),
+        exportOptions: {
+          columns: ':not(:last-child)'
+        }
+      }
+    ]
   }).buttons().container().appendTo('#pretty-table_wrapper .col-md-6:eq(0)');
-  
-  table.on('buttons-action', function (e, buttonApi, dataTable, node, config) {
-    if (buttonApi.text() === 'Copy' || buttonApi.text() === 'Excel' || buttonApi.text() === 'PDF' || buttonApi.text() === 'Print') {
-      var lastColumnIndex = table.columns().indexes().length - 1;
-      table.column(lastColumnIndex).visible(true);
-    }
-  });
 
   $('.modal').on('shown.bs.modal', function () {
     $(this).find('input:first').focus();
   });
   $('.modal').on('hide.bs.modal', function (e) {
-    if (!$(this).find('input:first').val() == ''){
+    if (!$(this).find('input:first').val() == '') {
       if (!confirm('Apakah Anda yakin ingin menutup? inputan anda tidak disimpan')) {
         e.preventDefault();
       }
+    }
+    else {
+      location.reload();
     }
   });
   $('.modal form').submit(function (event) {
     // Prevent the default form submission
     event.preventDefault();
 
-    // Serialize the form data
-    var formData = $(this).serialize();
+    if (confirm('Yakin akan menyimpan?')) {
+      // Serialize the form data
+      var formData = $(this).serialize();
 
-    // Send an AJAX request to the server
-    $.ajax({
+      // Send an AJAX request to the server
+      $.ajax({
         type: 'POST',
         url: $(this).prop('action'),
         data: formData,
         success: function (response) {
-            // Handle the success response
-            $(':input').val('');
-            toastr.success('Data berhasil ditambahkan');
-            $('table').load(window.location.href + ' table');
+          // Handle the success response
+          $(':input').val('');
+          toastr.success('Data berhasil ditambahkan');
+          $('table').load(window.location.href + ' table');
         },
         error: function (error) {
-            // Handle the error response
-            console.error('Error submitting data:', error);
-            // You can perform additional error handling here if needed
+          // Handle the error response
+          console.error('Error submitting data:', error);
+          // You can perform additional error handling here if needed
         }
-    });
-});
+      });
+    }
+  });
 })(jQuery)
