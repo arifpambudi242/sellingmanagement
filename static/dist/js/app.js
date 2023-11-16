@@ -894,7 +894,7 @@
     var formattedValue = isNaN(inputValue) ? '' : formatCurrency(inputValue);
     formattedValueSpan.text(formattedValue);
   });
-  
+
   // Add input event listener
   $('[type="number"]').on('input', function () {
     var parent = $(this).parent();
@@ -903,7 +903,7 @@
     var formattedValue = isNaN(inputValue) ? '' : formatCurrency(inputValue);
     formattedValueSpan.text(formattedValue);
   });
- 
+
   // Add blur event listener to remove the span
 
   // Function to format currency
@@ -916,5 +916,43 @@
     });
 
     return formattedValue;
+  }
+  // Menggunakan each() untuk iterasi melalui setiap elemen dengan kelas "currency"
+  $('.currency').each(function () {
+    // Mendapatkan nilai teks dari elemen
+    var originalValue = $(this).text();
+
+    // Mengubah nilai teks ke format mata uang yang diinginkan (IDR)
+    var formattedValue = parseFloat(originalValue.replace(/[^\d.]/g, '')); // Menghapus karakter non-digit
+    formattedValue = formattedValue.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+
+    // Menambahkan atribut title dengan nilai yang diformat
+    $(this).attr('title', convertToBahasaIndonesiaText(originalValue) + ' rupiah');
+    $(this).text(formattedValue);
+  });
+
+  function convertToBahasaIndonesiaText(value) {
+    var words = [
+      "", " satu", " dua", " tiga", " empat", " lima", " enam", " tujuh", " delapan", " sembilan", " sepuluh",
+      " sebelas", " dua belas", " tiga belas", " empat belas", " lima belas", " enam belas", " tujuh belas", " delapan belas", " sembilan belas"
+    ];
+
+    if (value < 20) {
+      return words[value];
+    } else if (value < 100) {
+      return words[Math.floor(value / 10)] + " puluh" + words[value % 10];
+    } else if (value < 1000) {
+      return words[Math.floor(value / 100)] + " ratus" + convertToBahasaIndonesiaText(value % 100);
+    } else if (value < 1000000) {
+      return convertToBahasaIndonesiaText(Math.floor(value / 1000)) + " ribu" + convertToBahasaIndonesiaText(value % 1000);
+    } else if (value < 1000000000) {
+      return convertToBahasaIndonesiaText(Math.floor(value / 1000000)) + " juta" + convertToBahasaIndonesiaText(value % 1000000);
+    } else if (value < 1000000000000) {
+      return convertToBahasaIndonesiaText(Math.floor(value / 1000000000)) + " miliar" + convertToBahasaIndonesiaText(value % 1000000000);
+    } else if (value < 1000000000000000) {
+      return convertToBahasaIndonesiaText(Math.floor(value / 1000000000000)) + " triliun" + convertToBahasaIndonesiaText(value % 1000000000000);
+    } else {
+      return "Nilai terlalu besar untuk dikonversi.";
+    }
   }
 })(jQuery)
