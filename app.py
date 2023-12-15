@@ -11,10 +11,10 @@ bcrypt = Bcrypt()
 
 dotenv.load_dotenv()
 
-USER_DB = os.getenv('USER_DB')
-PASSWORD_DB = os.getenv('PASSWORD_DB')
-HOST_DB = os.getenv('HOST_DB')
-NAME_DB = os.getenv('NAME_DB')
+# USER_DB = os.getenv('USER_DB')
+# PASSWORD_DB = os.getenv('PASSWORD_DB')
+# HOST_DB = os.getenv('HOST_DB')
+# NAME_DB = os.getenv('NAME_DB')
 SECRET_KEY = os.getenv('SECRET_KEY')
 SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
 
