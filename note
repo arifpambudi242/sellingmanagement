@@ -1,0 +1,51 @@
+usage example 
+new_user = User(username='john_doe', email='john@example.com', password='password123')
+db.session.add(new_user)
+db.session.commit()
+
+usage example verify password
+
+user = User.query.filter_by(username='john_doe').first()
+if user and user.check_password('password123'):
+    # User is authenticated
+else:
+    # Invalid username or password
+
+
+To perform a migration in Flask, you can use the Flask-Migrate extension, which is a Flask wrapper for Alembic, a database migration framework for SQLAlchemy.
+
+Here are the basic commands to perform a migration:
+
+1. Initialize Flask-Migrate:
+```bash
+flask db init
+```
+This will add a migrations folder to your application. The contents of this folder need to be added to version control along with your other source files.
+
+2. Generate an initial migration:
+```bash
+flask db migrate -m "Initial migration."
+```
+This will generate a new migration script in your migrations folder. Each time the database models change repeat this command.
+
+3. Apply the migration to the database:
+```bash
+flask db upgrade
+```
+This command applies the migration to the database, upgrading it to the latest revision.
+
+You run the `flask db migrate` command each time after you've made changes to the database models. This will generate a new migration script. Then, you apply the migration to the database using the `flask db upgrade` command. This will upgrade the database to match the current state of your application.
+
+Remember to set the `FLASK_APP` environment variable to your application's entry point script before running these commands. For example, if your application is defined in a `app.py` file, you would set the environment variable like this in a Unix-like system:
+
+```bash
+export FLASK_APP=app.py
+```
+
+Or like this in a Windows system:
+
+```bash
+set FLASK_APP=app.py
+```
+
+Please note that database migrations are a complex topic that involves more than just these three commands. Be sure to thoroughly understand the concept and review your migration scripts before applying them to your production databases. It's also a good practice to keep your migration scripts under version control.

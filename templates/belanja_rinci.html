@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 mb-4">
+                {%for belanja, belanja_rinci in datas %}
+                {% if loop.index == 1 %}
+                Rincian belanja: <b>{{ belanja.nama }}</b> ({{ belanja.keterangan }})
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 mb-4">
+                <button class="btn btn-sm btn-success float-right" data-toggle="modal" data-target="#inputModal"><i
+                        class="fas fa-plus"></i> Tambah</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <table id="pretty-table" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Barang</th>
+                            <th>Keterangan</th>
+                            <th>Created at</th>
+                            <th>Updated at</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for belanja, belanja_rinci in datas %}
+                        <tr>
+                            <td>{{loop.index}}</td>
+                            <td>{{belanja_rinci.nama_barang}} {{ belanja_rinci.total }}
+                            </td>
+                            <td>{{belanja_rinci.keterangan}}</td>
+                            <td>{{belanja_rinci.created_at}}</td>
+                            <td>{{belanja_rinci.updated_at}}</td>
+                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit"
+                                    data-link="{{ url_for('edit_belanja', belanja_id=belanja_rinci.id) }}"> <i
+                                        class="fas fa-edit"></i> </button>
+                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete"
+                                    data-link="{{ url_for('delete_belanja', belanja_id=belanja_rinci.id) }}"
+                                    data-id="{{ belanja_rinci.id }}"> <i class="fas fa-eraser"></i> </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Keterangan</th>
+                            <th>Created at</th>
+                            <th>Updated at</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- Modal -->
+<div class="modal fade modal-input" id="inputModal" tabindex="-1" role="dialog" aria-labelledby="inputModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inputModalLabel">Tambah Data Belanja</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/add_belanja" , method="post">
+                    <div class="form-group">
+                        <label for="nama">Nama</label>
+                        <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="keterangan">Keterangan</label>
+                        <input type="text" class="form-control" id="keterangan" name="keterangan"
+                            placeholder="Masukkan Keterangan" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary float-right" data-saved="0">Simpan</button>
+                    <button type="button" class="btn btn-danger float-right" data-dismiss="modal" aria-label="Close">
+                        Tutup
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade modal-edit" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Data Belanja</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/edit_belanja" , method="post">
+                    <div class="form-group">
+                        <label for="nama">Nama</label>
+                        <input type="text" class="form-control" id="edit-nama" name="nama" placeholder="Masukkan Nama"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="keterangan">Keterangan</label>
+                        <input type="text" class="form-control" id="edit-keterangan" name="keterangan"
+                            placeholder="Masukkan Keterangan" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary float-right" data-saved="0">Simpan</button>
+                    <button type="button" class="btn btn-danger float-right" data-dismiss="modal" aria-label="Close">
+                        Tutup
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+{% endblock %}
