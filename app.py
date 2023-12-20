@@ -291,7 +291,20 @@ def edit_belanja(belanja_id):
 
 @app.route('/belanja_rinci/<int:belanja_id>', methods=['GET','POST'])
 def belanja_rinci(belanja_id):
-    return jsonify({'error': f'belanja not found : {belanja_id}'}), 404
+    # get data belanja rinci by kode belanja
+    return render_template('belanja_rinci.html')
+
+@app.route('/add_belanja_rinci', methods=['POST'])
+def add_belanja_rinci():
+    nama = request.form.get('nama')
+    jumlah = request.form.get('jumlah')
+    keterangan = request.form.get('keterangan')
+    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
+    modal = Modal(nama=nama, jumlah=jumlah, keterangan=keterangan)
+    db.session.add(modal)
+    db.session.commit()
+    return jsonify({'status_code' : 200, 'status' : 'success', 'message' : 'berhasil tambah rincian'}), 200
+
 # end belanja
 # modal
 @app.route('/modal')
