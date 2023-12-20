@@ -5,6 +5,15 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 mb-4">
+                {%for belanja, belanja_rinci in datas %}
+                {% if loop.index == 1 %}
+                Rincian belanja: <b>{{ belanja.nama }}</b> ({{ belanja.keterangan }})
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 mb-4">
                 <button class="btn btn-sm btn-success float-right" data-toggle="modal" data-target="#inputModal"><i
                         class="fas fa-plus"></i> Tambah</button>
             </div>
@@ -15,7 +24,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Nama</th>
+                            <th>Nama Barang</th>
                             <th>Keterangan</th>
                             <th>Created at</th>
                             <th>Updated at</th>
@@ -23,17 +32,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {%for data in datas.belanja %}
+                        {%for belanja, belanja_rinci in datas %}
                         <tr>
                             <td>{{loop.index}}</td>
-                            <td>{{data.nama}}
+                            <td>{{belanja_rinci.nama_barang}} {{ belanja_rinci.total }}
                             </td>
-                            <td>{{data.keterangan}}</td>
-                            <td>{{data.created_at}}</td>
-                            <td>{{data.updated_at}}</td>
-                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit" data-link="{{ url_for('edit_belanja', belanja_id=data.id) }}"> <i class="fas fa-edit"></i> </button> 
-                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete" data-link="{{ url_for('delete_belanja', belanja_id=data.id) }}" data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button>
-                                <a title="Rinci belanja" class="btn-sm btn-success btn-detailed" href="{{ url_for('belanja_rinci', belanja_id=data.id) }}"> <i class="fas fa-eye"> Rinci Belanja</i> </a> </td>
+                            <td>{{belanja_rinci.keterangan}}</td>
+                            <td>{{belanja_rinci.created_at}}</td>
+                            <td>{{belanja_rinci.updated_at}}</td>
+                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit"
+                                    data-link="{{ url_for('edit_belanja', belanja_id=belanja_rinci.id) }}"> <i
+                                        class="fas fa-edit"></i> </button>
+                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete"
+                                    data-link="{{ url_for('delete_belanja', belanja_id=belanja_rinci.id) }}"
+                                    data-id="{{ belanja_rinci.id }}"> <i class="fas fa-eraser"></i> </button>
+                            </td>
                         </tr>
                         {% endfor %}
 
@@ -74,15 +87,6 @@
                             required>
                     </div>
                     <div class="form-group">
-                        <label for="sumber_dana">Sumber Dana</label>
-                        <select type="text" class="form-control" id="sumber_dana" name="sumber_dana" required>
-                            <option value=""> pilih sumber dana </option>
-                            {% for data in datas.modal %}
-                            <option class="currency" value="{{ data.id }}">{{ data.nama }} - {{ data.jumlah }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label for="keterangan">Keterangan</label>
                         <input type="text" class="form-control" id="keterangan" name="keterangan"
                             placeholder="Masukkan Keterangan" required>
@@ -112,15 +116,6 @@
                         <label for="nama">Nama</label>
                         <input type="text" class="form-control" id="edit-nama" name="nama" placeholder="Masukkan Nama"
                             required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sumber_dana">Sumber Dana</label>
-                        <select type="text" class="form-control" id="edit-sumber_dana" name="sumber_dana" required>
-                            <option value=""> pilih sumber dana </option>
-                            {% for data in datas.modal %}
-                            <option class="currency" value="{{ data.id }}">{{ data.nama }} - {{ data.jumlah }}</option>
-                            {% endfor %}
-                        </select>
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>

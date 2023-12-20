@@ -709,7 +709,8 @@
 
     return formattedDate;
   }
-  var table = $('#pretty-table').DataTable({
+
+  $('#pretty-table').DataTable({
     "responsive": true,
     "autoWidth": false,
     "language": {
@@ -737,33 +738,33 @@
       {
         extend: 'csv',
         text: 'CSV',
-        title: 'Laporan ' + doc_title + ' ' + current_date(),
+        title: 'Laporan ' + doc_title + ' per ' + current_date(),
         exportOptions: {
-          columns: ':not(:last-child)'
+          columns: ':not(:nth-last-child(-n+1))'
         }
       },
       {
         extend: 'excel',
         text: 'Excel',
-        title: 'Laporan ' + doc_title + ' ' + current_date(),
+        title: 'Laporan ' + doc_title + ' per ' + current_date(),
         exportOptions: {
-          columns: ':not(:last-child)'
+          columns: ':not(:nth-last-child(-n+1))'
         }
       },
       {
         extend: 'pdf',
         text: 'PDF',
-        title: 'Laporan ' + doc_title + ' ' + current_date(),
+        title: 'Laporan ' + doc_title + ' per ' + current_date(),
         exportOptions: {
-          columns: ':not(:last-child)'
+          columns: ':not(:nth-last-child(-n+1))'
         }
       },
       {
         extend: 'print',
         text: 'Print',
-        title: 'Laporan ' + doc_title + ' ' + current_date(),
+        title: 'Laporan ' + doc_title + ' per ' + current_date(),
         exportOptions: {
-          columns: ':not(:last-child)'
+          columns: ':not(:nth-last-child(-n+1))'
         }
       }
     ]
@@ -820,11 +821,21 @@
         url: $(this).data('link'),
         type: "POST",
         success: function (response) {
-          toastr.success('Data berhasil dihapus\nreloading......');
-          $('table').load(window.location.href + ' table');
-          setTimeout(function () {
-            location.reload(); // Reload the page for simplicity
-          }, 1000);
+          if (response.status_code == 404) {
+            toastr.warning(response.message);
+          }
+          if (response.status_code == 502) {
+            toastr.error(response.message);
+          }
+          if (response.status_code == 200) {
+            {
+              toastr.success(response.message);
+              $('table').load(window.location.href + ' table');
+              setTimeout(function () {
+                location.reload(); // Reload the page for simplicity
+              }, 1000);
+            }
+          }
         },
         error: function (error) {
           // Handle the error (if needed)
@@ -927,8 +938,8 @@
     formattedValue = formattedValue.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
 
     // Menambahkan atribut title dengan nilai yang diformat
-    $(this).attr('title', convertToBahasaIndonesiaText(originalValue) + ' rupiah');
-    $(this).text(formattedValue);
+    $(this).attr('title', convertToBahasaIndonesiaText(originalValue.replace(/[^\d.]/g, '')) + ' rupiah');
+    $(this).text(originalValue.replace(originalValue.replace(/[^\d.]/g, ''), formattedValue));
   });
 
   function convertToBahasaIndonesiaText(value) {

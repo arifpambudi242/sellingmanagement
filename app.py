@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate, upgrade, init
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, session
 import dotenv
@@ -11,11 +12,9 @@ bcrypt = Bcrypt()
 
 dotenv.load_dotenv()
 
-# USER_DB = os.getenv('USER_DB')
-# PASSWORD_DB = os.getenv('PASSWORD_DB')
-# HOST_DB = os.getenv('HOST_DB')
-# NAME_DB = os.getenv('NAME_DB')
+
 SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG')
 SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
 
 app = Flask(__name__)
@@ -23,7 +22,20 @@ app.secret_key = SECRET_KEY
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
-
+migrate = Migrate(app, db)
+with app.app_context():
+    try:
+        init()
+    except:
+        pass
+    try:
+        db.create_all()
+    except:
+        pass
+    try:
+        upgrade()
+    except:
+        pass
 class Sempol(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     harga = db.Column(db.Float)
@@ -147,6 +159,7 @@ def inject_data():
         'penjualan' : 'Penjualan',
         'produksi' : 'Produksi',
         'belanja' : 'Belanja',
+        'belanja_rinci' : 'Belanja Rinci',
         'modal' : 'Modal',
         'harga_jual' : 'Harga Jual',
     }
@@ -156,7 +169,8 @@ def inject_data():
         'index' : [Modal, Belanja, Produksi, HargaJual, Jual],
         'penjualan' : Jual,
         'produksi' : Produksi,
-        'belanja' : Belanja,
+        'belanja' : [Modal,Belanja],
+        'belanja_rinci' : BelanjaRinci,
         'modal' : Modal,
         'harga_jual' : HargaJual,
     }
@@ -187,6 +201,7 @@ def inject_data():
 
     return dict(tahun=tahun_str, active_title=active_title, datas=datas, no=no)
 
+
 @app.route('/')
 def index():
     sempol_data = Sempol.query.all()
@@ -194,6 +209,10 @@ def index():
     for sempol in sempol_data:
         prices += sempol.harga
     return render_template('index.html', data={'prices' : prices,'sempol_data' : sempol_data}, convert_date=convert_date, str_convert=str_convert)
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static', 'img'), 'favicon.ico', mimetype='image/png')
 
 @app.route('/add_sale', methods=['POST'])
 def add_sale():
@@ -217,6 +236,62 @@ def produksi():
 @app.route('/belanja')
 def belanja():
     return render_template('belanja.html')
+
+@app.route('/add_belanja', methods=['POST'])
+def add_belanja():
+    nama = request.form.get('nama')
+    keterangan = request.form.get('keterangan')
+    id_modal = request.form.get('sumber_dana')
+    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
+    belanja = Belanja(nama=nama, keterangan=keterangan, id_modal=id_modal)
+    db.session.add(belanja)
+    db.session.commit()
+    return redirect(url_for('belanja'))
+
+@app.route('/delete_belanja/<int:belanja_id>', methods=['POST'])
+def delete_belanja(belanja_id):
+    belanja = Belanja.query.get(belanja_id)
+    if belanja:
+        try:
+            db.session.delete(belanja)
+            db.session.commit()
+            return jsonify({'status_code' : 200,'message': 'Data Belanja berhasil dihapus'}), 200
+        except Exception as e:
+            return jsonify({'status_code' : 502,'message': 'Data masih digunakan di belanja rinci, anda tidak dapat menghapusnya'}), 200
+    else:
+        return jsonify({'status_code' : 404,'message': 'Data Belanja tidak ditemukan / sudah terhapus'}), 200
+
+@app.route('/edit_belanja/<int:belanja_id>', methods=['GET','POST'])
+def edit_belanja(belanja_id):
+    if not request.method == 'POST':
+        belanja = Belanja.query.get(belanja_id)
+        if belanja:
+            # If the belanja with the given ID exists, return its data
+            return jsonify({'id': belanja.id, 'nama': belanja.nama, 'keterangan' : belanja.keterangan, 'sumber_dana' : belanja.id_modal})
+        else:
+            # If the belanja with the given ID does not exist, return an error message
+            return jsonify({'error': 'belanja not found'}), 404
+    else:
+        belanja = Belanja.query.get(belanja_id)
+        if belanja:
+            # Get the updated data from the request
+            updated_data = request.form
+
+            # Update the belanja with the new data
+            belanja.nama = updated_data.get('nama', belanja.nama)
+            belanja.keterangan = updated_data.get('keterangan', belanja.keterangan)
+            belanja.id_modal = updated_data.get('sumber_dana', belanja.id_modal)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            return jsonify({'message': 'belanja updated successfully'})
+        else:
+            return jsonify({'error': 'belanja not found'}), 404
+
+@app.route('/belanja_rinci/<int:belanja_id>', methods=['GET','POST'])
+def belanja_rinci(belanja_id):
+    return jsonify({'error': f'belanja not found : {belanja_id}'}), 404
 # end belanja
 # modal
 @app.route('/modal')
@@ -238,9 +313,14 @@ def add_modal():
 def delete_modal(modal_id):
     modal = Modal.query.get(modal_id)
     if modal:
-        db.session.delete(modal)
-        db.session.commit()
-    return redirect(url_for('modal'))
+        try:
+            db.session.delete(modal)
+            db.session.commit()
+            return jsonify({'status_code' : 200,'message': 'Data modal berhasil dihapus'}), 200
+        except Exception as e:
+            return jsonify({'status_code' : 502,'message': 'Data masih digunakan di belanja, anda tidak dapat menghapusnya'}), 200
+    else:
+        return jsonify({'status_code' : 404,'message': 'Data modal tidak ditemukan / sudah terhapus'}), 200
 
 @app.route('/edit_modal/<int:modal_id>', methods=['GET','POST'])
 def edit_modal(modal_id):
@@ -279,6 +359,4 @@ def harga_jual():
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=DEBUG)
