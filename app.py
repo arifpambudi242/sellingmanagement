@@ -140,7 +140,53 @@ def inject_data():
     else:
         year_str = str(year)
 
-    return dict(year=year_str,)
+    active_menu = request.endpoint  # Assuming endpoint names match your menu names
+    menus = {
+        'index' : 'Home',
+        'penjualan' : 'Penjualan',
+        'produksi' : 'Produksi',
+        'belanja' : 'Belanja',
+        'belanja_rinci' : 'Belanja Rinci',
+        'modal' : 'Modal',
+        'harga_jual' : 'Harga Jual',
+    }
+    active_title = ''
+    
+    tables = {
+        'index' : [Modal, Belanja, Produksi, HargaJual, Jual],
+        'penjualan' : Jual,
+        'produksi' : Produksi,
+        'belanja' : [Modal,Belanja],
+        'belanja_rinci' : [Belanja, BelanjaRinci],
+        'modal' : Modal,
+        'harga_jual' : HargaJual,
+    }
+
+    for key, menu in menus.items():
+        if active_menu in key:
+            active_title = menu
+            break
+        else:
+            active_title = ''
+            continue
+    datas = None
+    for key, table in tables.items():
+        if active_menu in key:
+            if type(table) is not list:
+                datas = table.query.all()
+                break
+            else:
+                datas = {}
+                for tab in table:
+                    print(tab.__name__.lower())
+                    datas[tab.__name__.lower()] = tab.query.all()
+                break
+        else:
+            datas = None
+            continue
+    no = 0
+
+    return dict(tahun=tahun_str, active_title=active_title, datas=datas, no=no)
 
 
 
