@@ -23,19 +23,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-with app.app_context():
-    try:
-        init()
-    except:
-        pass
-    try:
-        db.create_all()
-    except:
-        pass
-    try:
-        upgrade()
-    except:
-        pass
+
 class Sempol(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     harga = db.Column(db.Float)
