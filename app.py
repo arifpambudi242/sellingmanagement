@@ -282,19 +282,17 @@ def edit_belanja(belanja_id):
 
 @app.route('/belanja_rinci/<int:belanja_id>', methods=['GET','POST'])
 def belanja_rinci(belanja_id):
+    if request.method == 'post':
+        nama_barang = request.get('nama_barang')
+        harga = request.get('harga')
+        jumlah = request.get('jumlah')
+        keterangan = request.get('keterangan')
+        belanja_rinci = BelanjaRinci(nama_barang = nama_barang,harga = harga,jumlah = jumlah,keterangan = keterangan)
+        db.session.add(belanja_rinci)
+        db.session.commit()
+        return jsonify({'status_code' : 200, 'status' : 'success', 'message' : 'berhasil tambah rincian'}), 200
     # get data belanja rinci by kode belanja
     return render_template('belanja_rinci.html')
-
-@app.route('/add_belanja_rinci', methods=['POST'])
-def add_belanja_rinci():
-    nama = request.form.get('nama')
-    jumlah = request.form.get('jumlah')
-    keterangan = request.form.get('keterangan')
-    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
-    modal = Modal(nama=nama, jumlah=jumlah, keterangan=keterangan)
-    db.session.add(modal)
-    db.session.commit()
-    return jsonify({'status_code' : 200, 'status' : 'success', 'message' : 'berhasil tambah rincian'}), 200
 
 # end belanja
 # modal
@@ -311,7 +309,7 @@ def add_modal():
     modal = Modal(nama=nama, jumlah=jumlah, keterangan=keterangan)
     db.session.add(modal)
     db.session.commit()
-    return redirect(url_for('modal'))
+    return jsonify({'status_code' : 200,'message': 'Data modal berhasil ditambahkan'}), 200
 
 @app.route('/delete_modal/<int:modal_id>', methods=['POST'])
 def delete_modal(modal_id):
