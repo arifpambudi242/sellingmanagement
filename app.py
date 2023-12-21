@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from flask_migrate import Migrate, upgrade, init
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, session
@@ -32,6 +33,7 @@ class Sempol(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
 class Modal(db.Model):
+    __tablename__ = 'modal'
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(255), nullable=False)
     jumlah = db.Column(db.Float, nullable=False)
@@ -39,7 +41,20 @@ class Modal(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
+    @property
+    def sisa(self):
+        total_belanja_rinci = (
+            db.session.query(func.sum(BelanjaRinci.harga * BelanjaRinci.jumlah))
+            .select_from(Modal)
+            .join(Belanja, Belanja.id_modal == Modal.id)
+            .join(BelanjaRinci, BelanjaRinci.belanja_id == Belanja.id)
+            .filter(Modal.id == self.id)
+            .scalar()
+        )
+        return self.jumlah - (total_belanja_rinci or 0)
+
 class Belanja(db.Model):
+    __tablename__ = 'belanja'
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(255), nullable=False)
     id_modal = db.Column(db.Integer, db.ForeignKey('modal.id'), nullable=False)
@@ -47,9 +62,10 @@ class Belanja(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
     
-    modal = db.relationship('Modal', backref=db.backref('Belanja', lazy=True))
+    modal = db.relationship('Modal', backref=db.backref('belanja', lazy=True))
 
 class BelanjaRinci(db.Model):
+    __tablename__ = 'belanja_rinci'
     id = db.Column(db.Integer, primary_key=True)
     nama_barang = db.Column(db.String(255), nullable=False)
     harga = db.Column(db.Float, nullable=False)
@@ -61,7 +77,9 @@ class BelanjaRinci(db.Model):
 
     belanja = db.relationship('Belanja', backref=db.backref('belanja_rinci', lazy=True))
 
-
+    @property
+    def total(self):
+        return self.jumlah * self.harga
 class Produksi(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_belanja = db.Column(db.Integer, db.ForeignKey('belanja.id'), nullable=False)
@@ -113,6 +131,28 @@ class Users(db.Model):
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
 
+
+# Global variable 
+menus = {
+        'index' : 'Home',
+        'penjualan' : 'Penjualan',
+        'produksi' : 'Produksi',
+        'belanja' : 'Belanja',
+        'belanja_rinci' : 'Belanja Rinci',
+        'modal' : 'Modal',
+        'harga_jual' : 'Harga Jual',
+    }
+
+tables = {
+        'index' : [Modal, Belanja, Produksi, HargaJual, Jual, BelanjaRinci],
+        'penjualan' : Jual,
+        'produksi' : Produksi,
+        'belanja' : [Modal,Belanja],
+        'belanja_rinci' : [Belanja,BelanjaRinci],
+        'modal' : Modal,
+        'harga_jual' : HargaJual,
+    }
+
 def convert_date(datestr):
 
     # Given datetime string
@@ -129,10 +169,15 @@ def convert_date(datestr):
 def str_convert(strin):
     return f'{strin}'
 
+def getdata(table, column, value):
+    global menus, tables
+    return tables[table].query.filter_by(belanja_id=1).first()
+
 
 
 @app.context_processor
 def inject_data():
+    global menus, tables
     tahun_sekarang = datetime.now().year
     tahun_dibuat = 2023
 
@@ -142,26 +187,10 @@ def inject_data():
         tahun_str = str(tahun_dibuat)
 
     active_menu = request.endpoint  # Assuming endpoint names match your menu names
-    menus = {
-        'index' : 'Home',
-        'penjualan' : 'Penjualan',
-        'produksi' : 'Produksi',
-        'belanja' : 'Belanja',
-        'belanja_rinci' : 'Belanja Rinci',
-        'modal' : 'Modal',
-        'harga_jual' : 'Harga Jual',
-    }
+    
     active_title = ''
     
-    tables = {
-        'index' : [Modal, Belanja, Produksi, HargaJual, Jual, BelanjaRinci],
-        'penjualan' : Jual,
-        'produksi' : Produksi,
-        'belanja' : [Modal,Belanja],
-        'belanja_rinci' : [Belanja,BelanjaRinci],
-        'modal' : Modal,
-        'harga_jual' : HargaJual,
-    }
+    
 
     for key, menu in menus.items():
         if active_menu in key:
@@ -184,10 +213,11 @@ def inject_data():
                         int(last_url) + 1
                         if 'belanja' in tab.__name__.lower():
                             datas[tab.__name__.lower()] = tab.query.get(int(last_url))
-                        if 'belanja_rinci' in tab.__name__.lower():
-                            datas[tab.__name__.lower()] = tab.query.get(int(last_url)).all()
+                        if 'belanjarinci' in tab.__name__.lower():
+                            datas[tab.__name__.lower()] = tab.query.filter_by(belanja_id=int(last_url)).all()
                     except:
                         datas[tab.__name__.lower()] = tab.query.all()
+                        
                 break
         else:
             datas = None
