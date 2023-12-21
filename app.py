@@ -182,7 +182,6 @@ def inject_data():
                 for tab in table:
                     try:
                         int(last_url) + 1
-                        print(100 * '=','\nlast url is digit\n', 100*'=')
                         if 'belanja' in tab.__name__.lower():
                             datas[tab.__name__.lower()] = tab.query.get(int(last_url))
                         if 'belanja_rinci' in tab.__name__.lower():
