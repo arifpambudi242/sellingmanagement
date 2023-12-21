@@ -134,12 +134,12 @@ def str_convert(strin):
 @app.context_processor
 def inject_data():
     tahun_sekarang = datetime.now().year
-    tahun = 2023
+    tahun_dibuat = 2023
 
-    if tahun < tahun_sekarang:
-        tahun_str = f"{tahun} - {tahun_sekarang}"
+    if tahun_dibuat < tahun_sekarang:
+        tahun_str = f"{tahun_dibuat} - {tahun_sekarang}"
     else:
-        tahun_str = str(tahun)
+        tahun_str = str(tahun_dibuat)
 
     active_menu = request.endpoint  # Assuming endpoint names match your menu names
     menus = {
@@ -154,11 +154,11 @@ def inject_data():
     active_title = ''
     
     tables = {
-        'index' : [Modal, Belanja, Produksi, HargaJual, Jual],
+        'index' : [Modal, Belanja, Produksi, HargaJual, Jual, BelanjaRinci],
         'penjualan' : Jual,
         'produksi' : Produksi,
         'belanja' : [Modal,Belanja],
-        'belanja_rinci' : BelanjaRinci,
+        'belanja_rinci' : [Belanja,BelanjaRinci],
         'modal' : Modal,
         'harga_jual' : HargaJual,
     }
@@ -177,10 +177,18 @@ def inject_data():
                 datas = table.query.all()
                 break
             else:
+                last_url = request.url.split('/')[-1]
                 datas = {}
                 for tab in table:
-                    print(tab.__name__.lower())
-                    datas[tab.__name__.lower()] = tab.query.all()
+                    try:
+                        int(last_url) + 1
+                        print(100 * '=','\nlast url is digit\n', 100*'=')
+                        if 'belanja' in tab.__name__.lower():
+                            datas[tab.__name__.lower()] = tab.query.get(int(last_url))
+                        if 'belanja_rinci' in tab.__name__.lower():
+                            datas[tab.__name__.lower()] = tab.query.get(int(last_url)).all()
+                    except:
+                        datas[tab.__name__.lower()] = tab.query.all()
                 break
         else:
             datas = None
@@ -192,11 +200,7 @@ def inject_data():
 
 @app.route('/')
 def index():
-    sempol_data = Sempol.query.all()
-    prices = 0
-    for sempol in sempol_data:
-        prices += sempol.harga
-    return render_template('index.html', data={'prices' : prices,'sempol_data' : sempol_data}, convert_date=convert_date, str_convert=str_convert)
+    return render_template('index.html')
 
 @app.route('/favicon.ico')
 def favicon():
