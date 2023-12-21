@@ -18,6 +18,7 @@
                             <th>Nama</th>
                             <th>Jumlah</th>
                             <th>Sisa</th>
+                            <th>Persentase</th>
                             <th>Keterangan</th>
                             <th>Created at</th>
                             <th>Updated at</th>
@@ -32,6 +33,7 @@
                             </td>
                             <td class="currency">{{data.jumlah}}</td>
                             <td class="currency">{{data.sisa}}</td>
+                            <td>{{ round(data.persentase, 2) }}%</td>
                             <td>{{data.keterangan}}</td>
                             <td>{{data.created_at}}</td>
                             <td>{{data.updated_at}}</td>
@@ -47,6 +49,7 @@
                             <th>Nama</th>
                             <th>Jumlah</th>
                             <th>Sisa</th>
+                            <th>Persentase</th>
                             <th>Keterangan</th>
                             <th>Created at</th>
                             <th>Updated at</th>

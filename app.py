@@ -52,6 +52,15 @@ class Modal(db.Model):
             .scalar()
         )
         return self.jumlah - (total_belanja_rinci or 0)
+    
+    @property
+    def persentase(self):
+        total_jumlah = (
+            db.session.query(func.sum(Modal.jumlah))
+            .select_from(Modal)
+            .scalar()
+        )
+        return self.jumlah / total_jumlah * 100
 
 class Belanja(db.Model):
     __tablename__ = 'belanja'
@@ -63,6 +72,19 @@ class Belanja(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
     
     modal = db.relationship('Modal', backref=db.backref('belanja', lazy=True))
+    
+    @property
+    def total_belanja(self):
+        total_belanja_rinci = (
+            db.session.query(func.sum(BelanjaRinci.harga * BelanjaRinci.jumlah))
+            .select_from(Belanja)
+            .join(BelanjaRinci, BelanjaRinci.belanja_id == Belanja.id)
+            .filter(Belanja.id == self.id)
+            .scalar()
+        )
+        return total_belanja_rinci or 0
+                                       
+        
 
 class BelanjaRinci(db.Model):
     __tablename__ = 'belanja_rinci'
@@ -80,6 +102,7 @@ class BelanjaRinci(db.Model):
     @property
     def total(self):
         return self.jumlah * self.harga
+    
 class Produksi(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_belanja = db.Column(db.Integer, db.ForeignKey('belanja.id'), nullable=False)
@@ -328,7 +351,7 @@ def belanja_rinci(belanja_id):
 # modal
 @app.route('/modal')
 def modal():
-    return render_template('modal.html')
+    return render_template('modal.html', round=round)
 
 @app.route('/add_modal', methods=['POST'])
 def add_modal():

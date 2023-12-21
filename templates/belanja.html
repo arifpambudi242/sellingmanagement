@@ -16,6 +16,8 @@
                         <tr>
                             <th>No</th>
                             <th>Nama</th>
+                            <th>Sumber Dana</th>
+                            <th>Total Belanja</th>
                             <th>Keterangan</th>
                             <th>Created at</th>
                             <th>Updated at</th>
@@ -28,6 +30,11 @@
                             <td>{{loop.index}}</td>
                             <td>{{data.nama}}
                             </td>
+                            <td>{{data.modal.nama}} <br> 
+                                Total dana :<span class="currency">{{ data.modal.jumlah }}</span> <br>
+                                Sisa : <span class="currency">{{ data.modal.jumlah - data.total_belanja }}</span>
+                            </td>
+                            <td class="currency">{{data.total_belanja}}</td>
                             <td>{{data.keterangan}}</td>
                             <td>{{data.created_at}}</td>
                             <td>{{data.updated_at}}</td>
@@ -42,6 +49,8 @@
                         <tr>
                             <th>No</th>
                             <th>Nama</th>
+                            <th>Sumber Dana</th>
+                            <th>Total Belanja</th>
                             <th>Keterangan</th>
                             <th>Created at</th>
                             <th>Updated at</th>
