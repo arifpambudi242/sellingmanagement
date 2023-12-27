@@ -896,9 +896,9 @@
   // Get the input element with type="number"
 
 
-  $('input[type="number"]').before('<span class="formattedValue"></span>');
+  $('input[type="number"].currency').before('<span class="formattedValue"></span>');
   // Add focus event listener
-  $('input[type="number"]').on('focus', function () {
+  $('input[type="number"].currency').on('focus', function () {
     var parent = $(this).parent();
     var formattedValueSpan = parent.find('.formattedValue');
     var inputValue = parseFloat($(this).val());
@@ -907,13 +907,34 @@
   });
 
   // Add input event listener
-  $('[type="number"]').on('input', function () {
+  $('input[type="number"].currency').on('input', function () {
     var parent = $(this).parent();
     var formattedValueSpan = parent.find('.formattedValue');
     var inputValue = parseFloat($(this).val());
     var formattedValue = isNaN(inputValue) ? '' : formatCurrency(inputValue);
     formattedValueSpan.text(formattedValue);
   });
+
+  $('input[type="number"].amount').before('<span class="MultipleValue"></span>');
+
+  // Add focus event listener
+  $('input[type="number"].amount').on('focus', function () {
+    var grandParent = $(this).parent().parent(); // Go up one more level
+    var MultipleValueSpan = grandParent.find('.MultipleValue');
+    var inputValue = parseFloat($(this).val()) * parseFloat(grandParent.find('input[type="number"][name="harga"]').val());
+    var MultipleValue = isNaN(inputValue) ? '' : formatCurrency(inputValue);
+    MultipleValueSpan.text(MultipleValue);
+  });
+
+  // Add input event listener
+  $('input[type="number"].amount').on('input', function () {
+    var grandParent = $(this).parent().parent(); // Go up one more level
+    var MultipleValueSpan = grandParent.find('.MultipleValue');
+    var inputValue = parseFloat($(this).val()) * parseFloat(grandParent.find('input[type="number"][name="harga"]').val());
+    var MultipleValue = isNaN(inputValue) ? '' : formatCurrency(inputValue);
+    MultipleValueSpan.text(MultipleValue);
+  });
+
 
   // Add blur event listener to remove the span
 

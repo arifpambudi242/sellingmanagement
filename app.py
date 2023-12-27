@@ -360,7 +360,36 @@ def delete_belanja_rinci(belanja_rinc_id):
             return jsonify({'status_code' : 502,'message': 'Data masih digunakan di belanja, anda tidak dapat menghapusnya'}), 200
     else:
         return jsonify({'status_code' : 404,'message': 'Data Belanja Rinci tidak ditemukan / sudah terhapus'}), 200
-    
+
+@app.route('/edit_belanja_rinci/<int:belanja_rinci_id>', methods=['GET','POST'])
+def edit_belanja_rinci(belanja_rinci_id):
+    if not request.method == 'POST':
+        belanja_rinci = BelanjaRinci.query.get(belanja_rinci_id)
+
+        if belanja_rinci:
+            # If the belanja_rinci with the given ID exists, return its data
+            return jsonify({'id': belanja_rinci.id, 'nama_barang': belanja_rinci.nama_barang, 'harga' : belanja_rinci.harga, 'jumlah' : belanja_rinci.jumlah, 'keterangan' : belanja_rinci.keterangan, 'belanja_id' : belanja_rinci.belanja_id})
+        else:
+            # If the belanja_rinci with the given ID does not exist, return an error message
+            return jsonify({'error': 'belanja_rinci not found'}), 404
+    else:
+        belanja_rinci = BelanjaRinci.query.get(belanja_rinci_id)
+        if belanja_rinci:
+            # Get the updated data from the request
+            updated_data = request.form
+
+            # Update the belanja_rinci with the new data
+            belanja_rinci.nama_barang = updated_data.get('nama_barang', belanja_rinci.nama_barang)
+            belanja_rinci.harga = updated_data.get('harga', belanja_rinci.harga)
+            belanja_rinci.jumlah = updated_data.get('jumlah', belanja_rinci.jumlah)
+            belanja_rinci.keterangan = updated_data.get('keterangan', belanja_rinci.keterangan)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            return jsonify({'message': 'belanja_rinci updated successfully'})
+        else:
+            return jsonify({'error': 'belanja_rinci not found'}), 404
 # end belanja
 # modal
 @app.route('/modal')
