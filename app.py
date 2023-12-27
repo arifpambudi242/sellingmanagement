@@ -290,7 +290,7 @@ def add_belanja():
     belanja = Belanja(nama=nama, keterangan=keterangan, id_modal=id_modal)
     db.session.add(belanja)
     db.session.commit()
-    return redirect(url_for('belanja'))
+    return jsonify({'status_code' : 200,'message': 'Data Belanja berhasil ditambahkan'}), 200
 
 @app.route('/delete_belanja/<int:belanja_id>', methods=['POST'])
 def delete_belanja(belanja_id):
@@ -333,20 +333,34 @@ def edit_belanja(belanja_id):
         else:
             return jsonify({'error': 'belanja not found'}), 404
 
-@app.route('/belanja_rinci/<int:belanja_id>', methods=['GET','POST'])
-def belanja_rinci(belanja_id):
-    if request.method == 'post':
-        nama_barang = request.get('nama_barang')
-        harga = request.get('harga')
-        jumlah = request.get('jumlah')
-        keterangan = request.get('keterangan')
-        belanja_rinci = BelanjaRinci(nama_barang = nama_barang,harga = harga,jumlah = jumlah,keterangan = keterangan)
+@app.route('/belanja_rinci/<int:blj_id>', methods=['GET','POST'])
+def belanja_rinci(blj_id):
+    if request.method == 'POST':
+        nama_barang = request.form.get('nama_barang')
+        harga = request.form.get('harga')
+        jumlah = request.form.get('jumlah')
+        keterangan = request.form.get('keterangan')
+        belanja_id = blj_id,
+        belanja_rinci = BelanjaRinci(nama_barang = nama_barang,harga = harga,jumlah = jumlah, belanja_id = blj_id, keterangan = keterangan)
         db.session.add(belanja_rinci)
         db.session.commit()
         return jsonify({'status_code' : 200, 'status' : 'success', 'message' : 'berhasil tambah rincian'}), 200
     # get data belanja rinci by kode belanja
     return render_template('belanja_rinci.html')
 
+@app.route('/delete_belanja_rinci/<int:belanja_rinc_id>', methods=['POST'])
+def delete_belanja_rinci(belanja_rinc_id):
+    modal = BelanjaRinci.query.get(belanja_rinc_id)
+    if modal:
+        try:
+            db.session.delete(modal)
+            db.session.commit()
+            return jsonify({'status_code' : 200,'message': 'Data Belanja Rinci berhasil dihapus'}), 200
+        except Exception as e:
+            return jsonify({'status_code' : 502,'message': 'Data masih digunakan di belanja, anda tidak dapat menghapusnya'}), 200
+    else:
+        return jsonify({'status_code' : 404,'message': 'Data Belanja Rinci tidak ditemukan / sudah terhapus'}), 200
+    
 # end belanja
 # modal
 @app.route('/modal')
