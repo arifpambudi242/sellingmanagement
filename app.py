@@ -8,6 +8,10 @@ import dotenv
 import os
 from datetime import datetime
 from flask_bcrypt import Bcrypt
+from currency_converter import ECB_URL, CurrencyConverter
+c = CurrencyConverter(ECB_URL)
+
+
 
 bcrypt = Bcrypt()
 
@@ -25,13 +29,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-class Sempol(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    harga = db.Column(db.Float)
-    waktu = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
-
+def convertToUsd(idr):
+    return round(c.convert(idr, 'IDR', 'USD', None), 2)
 class Modal(db.Model):
     __tablename__ = 'modal'
     id = db.Column(db.Integer, primary_key=True)
@@ -61,6 +60,16 @@ class Modal(db.Model):
             .scalar()
         )
         return self.jumlah / total_jumlah * 100
+    
+    @property
+    def jumlah_usd(self):
+        return convertToUsd(self.jumlah)
+    
+    @property
+    def sisa_usd(self):
+        return convertToUsd(self.sisa)
+    
+    
 
 class Belanja(db.Model):
     __tablename__ = 'belanja'
@@ -83,8 +92,22 @@ class Belanja(db.Model):
             .scalar()
         )
         return total_belanja_rinci or 0
-                                       
+    
+    @property
+    def total_belanja_usd(self):
+        return convertToUsd(self.total_belanja)
+    
+    @property
+    def belanja_rinci_list(self):
+        rincians = (
+            db.session.query(BelanjaRinci)
+            .filter(BelanjaRinci.belanja_id == self.id)
+            .all()
+        )
         
+        return ', '.join([rincian.nama_barang for rincian in rincians])
+    
+    
 
 class BelanjaRinci(db.Model):
     __tablename__ = 'belanja_rinci'
@@ -102,6 +125,15 @@ class BelanjaRinci(db.Model):
     @property
     def total(self):
         return self.jumlah * self.harga
+    
+    @property
+    def total_usd(self):
+        return convertToUsd(self.total)
+    
+    @property
+    def harga_usd(self):
+        return convertToUsd(self.harga)
+    
     
 class Produksi(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -121,6 +153,10 @@ class HargaJual(db.Model):
     keterangan = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    
+    @property
+    def harga_usd(self):
+        return convertToUsd(self.harga)
 
 
 class Jual(db.Model):
@@ -195,7 +231,6 @@ def str_convert(strin):
 def getdata(table, column, value):
     global menus, tables
     return tables[table].query.filter_by(belanja_id=1).first()
-
 
 
 @app.context_processor

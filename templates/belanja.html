@@ -15,26 +15,26 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Nama</th>
-                            <th>Sumber Dana</th>
-                            <th>Total Belanja</th>
-                            <th>Keterangan</th>
+                            <th>Name</th>
+                            <th>Source of Funds</th>
+                            <th>Total Spending</th>
+                            <th>Description</th>
                             <th>Created at</th>
                             <th>Updated at</th>
-                            <th>Aksi</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {%for data in datas.belanja %}
                         <tr>
                             <td>{{loop.index}}</td>
-                            <td>{{data.nama}}
+                            <td title="{{ data.belanja_rinci_list }}">{{data.nama}}
                             </td>
                             <td>{{data.modal.nama}} <br> 
-                                Total dana :<span class="currency">{{ data.modal.jumlah }}</span> <br>
-                                Sisa : <span class="currency">{{ data.modal.jumlah - data.total_belanja }}</span>
+                                Total dana :<span class="currency">{{ data.modal.jumlah }}</span>(${{ data.modal.jumlah_usd }}) <br>
+                                Sisa : <span class="currency">{{ data.modal.sisa }}</span>(${{ data.modal.sisa_usd }})
                             </td>
-                            <td class="currency">{{data.total_belanja}}</td>
+                            <td><span class="currency">{{data.total_belanja}}</span>(${{data.total_belanja_usd}})</td>
                             <td>{{data.keterangan}}</td>
                             <td>{{data.created_at}}</td>
                             <td>{{data.updated_at}}</td>
@@ -48,13 +48,13 @@
                     <tfoot>
                         <tr>
                             <th>No</th>
-                            <th>Nama</th>
-                            <th>Sumber Dana</th>
-                            <th>Total Belanja</th>
-                            <th>Keterangan</th>
+                            <th>Name</th>
+                            <th>Source of Funds</th>
+                            <th>Total Spending</th>
+                            <th>Description</th>
                             <th>Created at</th>
                             <th>Updated at</th>
-                            <th>Aksi</th>
+                            <th>Action</th>
                         </tr>
                     </tfoot>
                 </table>
