@@ -280,9 +280,8 @@ def inject_data():
         else:
             datas = None
             continue
-    no = 0
 
-    return dict(tahun=tahun_str, active_title=active_title, datas=datas, no=no)
+    return dict(tahun=tahun_str, active_title=active_title, datas=datas)
 
 @app.template_filter()
 def format_currency(value):
