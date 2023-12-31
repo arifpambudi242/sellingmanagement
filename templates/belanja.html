@@ -87,7 +87,7 @@
                         <select type="text" class="form-control" id="sumber_dana" name="sumber_dana" required>
                             <option value=""> pilih sumber dana </option>
                             {% for data in datas.modal %}
-                            <option class="currency" value="{{ data.id }}">{{ data.nama }} - {{ data.jumlah }}</option>
+                            <option value="{{ data.id }}">{{ data.nama }} - {{ data.jumlah | format_currency }} sisa {{data.sisa | format_currency}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -127,7 +127,7 @@
                         <select type="text" class="form-control" id="edit-sumber_dana" name="sumber_dana" required>
                             <option value=""> pilih sumber dana </option>
                             {% for data in datas.modal %}
-                            <option class="currency" value="{{ data.id }}">{{ data.nama }} - {{ data.jumlah }}</option>
+                            <option value="{{ data.id }}">{{ data.nama }} - {{ data.jumlah | format_currency }} sisa {{data.sisa | format_currency}}</option>
                             {% endfor %}
                         </select>
                     </div>

@@ -205,7 +205,7 @@ menus = {
 tables = {
         'index' : [Modal, Belanja, Produksi, HargaJual, Jual, BelanjaRinci],
         'penjualan' : Jual,
-        'produksi' : Produksi,
+        'produksi' : [Produksi, Belanja],
         'belanja' : [Modal,Belanja],
         'belanja_rinci' : [Belanja,BelanjaRinci],
         'modal' : Modal,
@@ -284,6 +284,9 @@ def inject_data():
 
     return dict(tahun=tahun_str, active_title=active_title, datas=datas, no=no)
 
+@app.template_filter()
+def format_currency(value):
+    return "Rp. {:,.2f}".format(value)
 
 @app.route('/')
 def index():
@@ -293,15 +296,6 @@ def index():
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static', 'img'), 'favicon.ico', mimetype='image/png')
 
-@app.route('/add_sale', methods=['POST'])
-def add_sale():
-    harga = request.form.get('harga')
-    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
-    sempol = Sempol(harga=harga)
-    db.session.add(sempol)
-    db.session.commit()
-    return redirect(url_for('index'))
-
 
 
 @app.route('/penjualan')
@@ -310,7 +304,7 @@ def penjualan():
 
 @app.route('/produksi')
 def produksi():
-    return "Ini adalah halaman Produksi"
+    return render_template('produksi.html')
 # belanja
 @app.route('/belanja')
 def belanja():
