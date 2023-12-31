@@ -37,10 +37,12 @@
                         <tr>
                             <th>No</th>
                             <th>Name</th>
-                            <th>Harga</th>
+                            <th>Price(IDR)</th>
+                            <th>Price(USD)</th>
                             <th>Amount</th>
                             <th>Description</th>
-                            <th>Total</th>
+                            <th>Total(IDR)</th>
+                            <th>Total(USD)</th>
                             <th>Created at</th>
                             <th>Updated at</th>
                             <th>Action</th>
@@ -53,10 +55,12 @@
                             <td>{{loop.index}}</td>
                             <td>{{belanja_rinci.nama_barang}}</span>
                             </td>
-                            <td><span class="currency">{{belanja_rinci.harga}}</span>(${{ belanja_rinci.harga_usd }})</td>
+                            <td>{{belanja_rinci.harga}}</td>
+                            <td>{{belanja_rinci.harga_usd}}</td>
                             <td>{{belanja_rinci.jumlah}}</td>
                             <td>{{belanja_rinci.keterangan}}</td>
-                            <td><span class="currency">{{belanja_rinci.total}}</span>(${{ belanja_rinci.total_usd }})</td>
+                            <td>{{belanja_rinci.total}}</td>
+                            <td>{{belanja_rinci.total_usd}}</td>
                             <td>{{belanja_rinci.created_at}}</td>
                             <td>{{belanja_rinci.updated_at}}</td>
                             <td>
@@ -75,10 +79,12 @@
                         <tr>
                             <th>No</th>
                             <th>Name</th>
-                            <th>Description</th>
-                            <th>Harga</th>
+                            <th>Price(IDR)</th>
+                            <th>Price(USD)</th>
                             <th>Amount</th>
-                            <th>Total</th>
+                            <th>Description</th>
+                            <th>Total(IDR)</th>
+                            <th>Total(USD)</th>
                             <th>Created at</th>
                             <th>Updated at</th>
                             <th>Action</th>
