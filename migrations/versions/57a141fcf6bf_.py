@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 026aa358cfb3
+Revision ID: 57a141fcf6bf
 Revises: 
-Create Date: 2023-11-20 08:07:39.730464
+Create Date: 2024-01-02 03:26:00.725686
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '026aa358cfb3'
+revision = '57a141fcf6bf'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -32,14 +32,6 @@ def upgrade():
     sa.Column('nama', sa.String(length=255), nullable=False),
     sa.Column('jumlah', sa.Float(), nullable=False),
     sa.Column('keterangan', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('sempol',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('harga', sa.Float(), nullable=True),
-    sa.Column('waktu', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -111,7 +103,6 @@ def downgrade():
     op.drop_table('belanja_rinci')
     op.drop_table('belanja')
     op.drop_table('users')
-    op.drop_table('sempol')
     op.drop_table('modal')
     op.drop_table('harga_jual')
     # ### end Alembic commands ###
