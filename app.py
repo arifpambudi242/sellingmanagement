@@ -19,6 +19,7 @@ dotenv.load_dotenv()
 
 
 SECRET_KEY = os.getenv('SECRET_KEY')
+PORT = os.getenv('PORT')
 DEBUG = os.getenv('DEBUG')
 SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
 
@@ -314,7 +315,6 @@ def add_belanja():
     nama = request.form.get('nama')
     keterangan = request.form.get('keterangan')
     id_modal = request.form.get('sumber_dana')
-    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
     belanja = Belanja(nama=nama, keterangan=keterangan, id_modal=id_modal)
     db.session.add(belanja)
     db.session.commit()
@@ -485,4 +485,4 @@ def harga_jual():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=DEBUG)
+    app.run(host='0.0.0.0', port=PORT,debug=DEBUG)
