@@ -8,8 +8,8 @@ import dotenv
 import os
 from datetime import datetime
 from flask_bcrypt import Bcrypt
-from currency_converter import ECB_URL, CurrencyConverter
-c = CurrencyConverter(ECB_URL)
+from currency_converter import CurrencyConverter
+c = CurrencyConverter()
 
 
 
@@ -40,18 +40,6 @@ class Modal(db.Model):
     keterangan = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
-
-    @property
-    def sisa(self):
-        total_belanja_rinci = (
-            db.session.query(func.sum(BelanjaRinci.harga * BelanjaRinci.jumlah))
-            .select_from(Modal)
-            .join(Belanja, Belanja.id_modal == Modal.id)
-            .join(BelanjaRinci, BelanjaRinci.belanja_id == Belanja.id)
-            .filter(Modal.id == self.id)
-            .scalar()
-        )
-        return self.jumlah - (total_belanja_rinci or 0)
     
     @property
     def persentase(self):
@@ -66,11 +54,18 @@ class Modal(db.Model):
     def jumlah_usd(self):
         return convertToUsd(self.jumlah)
     
+class SumberDana(db.Model):
+    __tablename__ = 'sumber_dana'
+    id = db.Column(db.Integer, primary_key=True)
+    nama = db.Column(db.String(255), nullable=False)
+    jumlah  = db.Column(db.Float, nullable=False)
+    keterangan = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+
     @property
-    def sisa_usd(self):
-        return convertToUsd(self.sisa)
-    
-    
+    def jumlah_usd(self):
+        return convertToUsd(self.jumlah)
 
 class Belanja(db.Model):
     __tablename__ = 'belanja'
