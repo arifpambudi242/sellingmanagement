@@ -42,13 +42,17 @@ class Modal(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
     
     @property
-    def persentase(self):
-        total_jumlah = (
+    def total_jumlah(self):
+        return (
             db.session.query(func.sum(Modal.jumlah))
             .select_from(Modal)
             .scalar()
         )
-        return self.jumlah / total_jumlah * 100
+
+    
+    @property
+    def persentase(self):
+        return self.jumlah / self.total_jumlah * 100
     
     @property
     def jumlah_usd(self):
@@ -62,6 +66,25 @@ class SumberDana(db.Model):
     keterangan = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    
+    
+    @property
+    def total_jumlah(self):
+        return (
+            db.session.query(func.sum(SumberDana.jumlah))
+            .select_from(SumberDana)
+            .scalar()
+        )
+    
+    @property
+    def total_sisa(self):
+        total_jumlah_modal = (
+            db.session.query(func.sum(Modal.jumlah))
+            .select_from(Modal)
+            .scalar()
+        )
+        
+        return total_jumlah_modal - self.total_jumlah
 
     @property
     def jumlah_usd(self):
@@ -195,6 +218,7 @@ menus = {
         'belanja' : 'Belanja',
         'belanja_rinci' : 'Belanja Rinci',
         'modal' : 'Modal',
+        'sumber_dana' : 'Sumber Dana',
         'harga_jual' : 'Harga Jual',
     }
 
@@ -205,6 +229,7 @@ tables = {
         'belanja' : [Modal,Belanja],
         'belanja_rinci' : [Belanja,BelanjaRinci],
         'modal' : Modal,
+        'sumber_dana' : SumberDana,
         'harga_jual' : HargaJual,
     }
 
@@ -419,6 +444,7 @@ def edit_belanja_rinci(belanja_rinci_id):
 def modal():
     return render_template('modal.html', round=round)
 
+
 @app.route('/add_modal', methods=['POST'])
 def add_modal():
     nama = request.form.get('nama')
@@ -474,6 +500,13 @@ def edit_modal(modal_id):
 
 # end modal
 
+# sumber dana
+@app.route('/sumber_dana')
+def sumber_dana():
+    return render_template('sumber_dana.html', round=round)
+
+
+# end sumber dana
 @app.route('/harga_jual')
 def harga_jual():
     return "Ini adalah halaman Harga Jual"

@@ -150,6 +150,13 @@
               </a>
             </li>
             <li class="nav-item">
+              <a href="{{url_for('sumber_dana')}}"
+                class="nav-link {% if 'sumber dana' in active_title.lower() %} active {% endif %}">
+                <i class="nav-icon fas fa-money-bill"></i>
+                <p>Sumber Dana</p>
+              </a>
+            </li>
+            <li class="nav-item">
               <a href="{{url_for('modal')}}"
                 class="nav-link {% if 'modal' in active_title.lower() %} active {% endif %}">
                 <i class="nav-icon fas fa-dollar-sign"></i>

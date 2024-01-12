@@ -16,30 +16,27 @@
                         <tr>
                             <th>No</th>
                             <th>Name</th>
-                            <th>Source of Funds</th>
-                            <th>Total Spending</th>
+                            <th>Amount(IDR)</th>
+                            <th>Amount(USD)</th>
+                            <th>Percentage</th>
                             <th>Description</th>
-                            <th>Created at</th>
                             <th>Updated at</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {%for data in datas.belanja %}
+                        {%for data in datas %}
                         <tr>
                             <td>{{loop.index}}</td>
-                            <td title="{{ data.belanja_rinci_list }}">{{data.nama}}
+                            <td>{{data.nama}}
                             </td>
-                            <td>
-                                kosongkan dulu
-                            </td>
-                            <td><span class="currency">{{data.total_belanja}}</span>(${{data.total_belanja_usd}})</td>
+                            <td><span class="currency">{{data.jumlah}}</span></td>
+                            <td>{{data.jumlah_usd}}</td>
+                            <td>{{ round(data.persentase, 2) }}%</td>
                             <td>{{data.keterangan}}</td>
-                            <td>{{data.created_at}}</td>
                             <td>{{data.updated_at}}</td>
-                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit" data-link="{{ url_for('edit_belanja', belanja_id=data.id) }}"> <i class="fas fa-edit"></i> </button> 
-                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete" data-link="{{ url_for('delete_belanja', belanja_id=data.id) }}" data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button>
-                                <button title="Rinci belanja" class="btn-sm btn-success btn-detailed" onclick="location.href = '{{ url_for('belanja_rinci', blj_id=data.id) }}'"> <i class="fas fa-eye"></i> </> </td>
+                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit" data-link="{{ url_for('edit_modal', modal_id=data.id) }}"> <i class="fas fa-edit"></i> </button> 
+                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete" data-link="{{ url_for('delete_modal', modal_id=data.id) }}" data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button></td>
                         </tr>
                         {% endfor %}
 
@@ -48,10 +45,10 @@
                         <tr>
                             <th>No</th>
                             <th>Name</th>
-                            <th>Source of Funds</th>
-                            <th>Total Spending</th>
+                            <th>Amount(IDR)</th>
+                            <th>Amount(USD)</th>
+                            <th>Percentage</th>
                             <th>Description</th>
-                            <th>Created at</th>
                             <th>Updated at</th>
                             <th>Action</th>
                         </tr>
@@ -69,24 +66,22 @@
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="inputModalLabel">Tambah Data Belanja</h5>
+                <h5 class="modal-title" id="inputModalLabel">Tambah Data Modal</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/add_belanja" , method="post">
+                <form action="/add_modal" , method="post">
                     <div class="form-group">
                         <label for="nama">Nama</label>
                         <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama"
                             required>
                     </div>
                     <div class="form-group">
-                        <label for="sumber_dana">Sumber Dana</label>
-                        <select type="text" class="form-control" id="sumber_dana" name="sumber_dana" required>
-                            <option value=""> pilih sumber dana </option>
-                           
-                        </select>
+                        <label for="jumlah">Jumlah</label>
+                        <input type="number" class="form-control currency" id="jumlah" name="jumlah"
+                            placeholder="Masukkan Jumlah" required>
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
@@ -107,24 +102,22 @@
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Data Belanja</h5>
+                <h5 class="modal-title" id="editModalLabel">Edit Data Modal</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/edit_belanja" , method="post">
+                <form action="/edit_modal" , method="post">
                     <div class="form-group">
                         <label for="nama">Nama</label>
                         <input type="text" class="form-control" id="edit-nama" name="nama" placeholder="Masukkan Nama"
                             required>
                     </div>
                     <div class="form-group">
-                        <label for="sumber_dana">Sumber Dana</label>
-                        <select type="text" class="form-control" id="edit-sumber_dana" name="sumber_dana" required>
-                            <option value=""> pilih sumber dana </option>
-                            
-                        </select>
+                        <label for="jumlah">Jumlah</label>
+                        <input type="number" class="form-control currency" id="edit-jumlah" name="jumlah"
+                            placeholder="Masukkan Jumlah" required>
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
