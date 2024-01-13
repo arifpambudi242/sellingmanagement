@@ -91,12 +91,12 @@ class Belanja(db.Model):
     __tablename__ = 'belanja'
     id = db.Column(db.Integer, primary_key=True)
     nama = db.Column(db.String(255), nullable=False)
-    id_modal = db.Column(db.Integer, db.ForeignKey('modal.id'), nullable=False)
+    id_sumber_dana = db.Column(db.Integer, db.ForeignKey('sumber_dana.id'), nullable=False)
     keterangan = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
     
-    modal = db.relationship('Modal', backref=db.backref('belanja', lazy=True))
+    sumber_dana = db.relationship('SumberDana', backref=db.backref('belanja', lazy=True))
     
     @property
     def total_belanja(self):
@@ -223,7 +223,7 @@ tables = {
         'index' : [Modal, Belanja, Produksi, HargaJual, Jual, BelanjaRinci],
         'penjualan' : Jual,
         'produksi' : [Produksi, Belanja],
-        'belanja' : [Modal,Belanja],
+        'belanja' : [SumberDana,Belanja],
         'belanja_rinci' : [Belanja,BelanjaRinci],
         'modal' : Modal,
         'sumber_dana' : SumberDana,
@@ -257,19 +257,15 @@ def total_sisa_modal():
             .scalar()
         )
         
-        # get the current year and month
-        now = datetime.now()
-        year = now.year
-        month = now.month
-        
-        return total_jumlah_modal - SumberDana().total_jumlah
+        return total_jumlah_modal - (SumberDana().total_jumlah if SumberDana().total_jumlah else 0)
 
 def jumlah_modal_investor():
-    return (
+    total_modal = (
             db.session.query(func.sum(Modal.jumlah))
             .select_from(Modal)
             .scalar()
         )
+    return total_modal if total_modal else 0 
 
 @app.context_processor
 def inject_data():

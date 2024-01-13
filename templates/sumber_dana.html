@@ -5,7 +5,19 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 mb-4">
-                Rincian belanja: <span class="currency">{{ sisa_modal() }}</span>
+                <table>
+                    <tr>
+                        <td>Jumlah Modal</td>
+                        <td>:</td>
+                        <td><b class="currency" id="modal-investor">{{ total_modal_investor() }}</b> (<span class="sebutkan" data-angka="#modal-investor"></span>)</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Jumlah Sisa</td>
+                        <td>:</td>
+                        <td><b class="currency" id="sisa">{{ sisa_modal() }}</b> (<span class="sebutkan" data-angka="#sisa"></span>)</td>
+                    </tr>
+                </table>
             </div>
         </div>
         <div class="row">
@@ -82,7 +94,7 @@
                     </div>
                     <div class="form-group">
                         <label for="jumlah">Jumlah</label>
-                        <input type="number" class="form-control currency" id="jumlah" name="jumlah"
+                        <input type="number"   class="form-control currency" id="jumlah" name="jumlah"
                             placeholder="Masukkan Jumlah" required>
                     </div>
                     <div class="form-group">
@@ -118,7 +130,7 @@
                     </div>
                     <div class="form-group">
                         <label for="jumlah">Jumlah</label>
-                        <input type="number" class="form-control currency" id="edit-jumlah" name="jumlah"
+                        <input type="number"   class="form-control currency" id="edit-jumlah" name="jumlah"
                             placeholder="Masukkan Jumlah" required>
                     </div>
                     <div class="form-group">

@@ -5,7 +5,8 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 mb-4">
-                Total Modal: <span class="currency">{{ total_modal_investor() }}</span>
+                Total Modal: <b class="currency" id="modal">{{ total_modal_investor() }}</b> (<span class="sebutkan"
+                    data-angka="#modal"></span>)
             </div>
         </div>
         <div class="row">
@@ -42,8 +43,13 @@
                             <td>{% if data.is_pemodal %} Yes {% else %} No {% endif %}</td>
                             <td>{{data.keterangan}}</td>
                             <td>{{data.updated_at}}</td>
-                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit" data-link="{{ url_for('edit_modal', modal_id=data.id) }}"> <i class="fas fa-edit"></i> </button> 
-                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete" data-link="{{ url_for('delete_modal', modal_id=data.id) }}" data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button></td>
+                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit"
+                                    data-link="{{ url_for('edit_modal', modal_id=data.id) }}"> <i
+                                        class="fas fa-edit"></i> </button>
+                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete"
+                                    data-link="{{ url_for('delete_modal', modal_id=data.id) }}" data-id="{{ data.id }}">
+                                    <i class="fas fa-eraser"></i> </button>
+                            </td>
                         </tr>
                         {% endfor %}
 
@@ -88,7 +94,7 @@
                     </div>
                     <div class="form-group">
                         <label for="jumlah">Jumlah</label>
-                        <input type="number" class="form-control currency" id="jumlah" name="jumlah"
+                        <input type="number"   class="form-control currency" id="jumlah" name="jumlah"
                             placeholder="Masukkan Jumlah" required>
                     </div>
                     <div class="form-group">
@@ -96,7 +102,7 @@
                         <input type="text" class="form-control" id="keterangan" name="keterangan"
                             placeholder="Masukkan Keterangan" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="is_pemodal">Pemodal</label>
                         <input type="checkbox" class="form-control" id="is_pemodal" name="is_pemodal">
@@ -130,7 +136,7 @@
                     </div>
                     <div class="form-group">
                         <label for="jumlah">Jumlah</label>
-                        <input type="number" class="form-control currency" id="edit-jumlah" name="jumlah"
+                        <input type="number"   class="form-control currency" id="edit-jumlah" name="jumlah"
                             placeholder="Masukkan Jumlah" required>
                     </div>
                     <div class="form-group">

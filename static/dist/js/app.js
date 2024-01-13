@@ -966,28 +966,38 @@
     $(this).text(originalValue.replace(originalValue.replace(/[^\d.]/g, ''), formattedValue));
   });
 
-  function convertToBahasaIndonesiaText(value) {
+  function convertToBahasaIndonesiaText(value, step=0) {
     var words = [
       "", " satu", " dua", " tiga", " empat", " lima", " enam", " tujuh", " delapan", " sembilan", " sepuluh",
       " sebelas", " dua belas", " tiga belas", " empat belas", " lima belas", " enam belas", " tujuh belas", " delapan belas", " sembilan belas"
     ];
-
+    
+    if (step == 0 && value == 0){
+      return ' Nol '
+    }
     if (value < 20) {
       return words[value];
     } else if (value < 100) {
       return words[Math.floor(value / 10)] + " puluh" + words[value % 10];
     } else if (value < 1000) {
-      return words[Math.floor(value / 100)] + " ratus" + convertToBahasaIndonesiaText(value % 100);
+      return words[Math.floor(value / 100)] + " ratus" + convertToBahasaIndonesiaText(value % 100,step=step=step+1);
     } else if (value < 1000000) {
-      return convertToBahasaIndonesiaText(Math.floor(value / 1000)) + " ribu" + convertToBahasaIndonesiaText(value % 1000);
+      return convertToBahasaIndonesiaText(Math.floor(value / 1000), step=step=step+1) + " ribu" + convertToBahasaIndonesiaText(value % 1000, step=step=step+1);
     } else if (value < 1000000000) {
-      return convertToBahasaIndonesiaText(Math.floor(value / 1000000)) + " juta" + convertToBahasaIndonesiaText(value % 1000000);
+      return convertToBahasaIndonesiaText(Math.floor(value / 1000000), step=step=step+1) + " juta" + convertToBahasaIndonesiaText(value % 1000000, step=step=step+1);
     } else if (value < 1000000000000) {
-      return convertToBahasaIndonesiaText(Math.floor(value / 1000000000)) + " miliar" + convertToBahasaIndonesiaText(value % 1000000000);
+      return convertToBahasaIndonesiaText(Math.floor(value / 1000000000), step=step=step+1) + " miliar" + convertToBahasaIndonesiaText(value % 1000000000, step=step=step+1);
     } else if (value < 1000000000000000) {
-      return convertToBahasaIndonesiaText(Math.floor(value / 1000000000000)) + " triliun" + convertToBahasaIndonesiaText(value % 1000000000000);
+      return convertToBahasaIndonesiaText(Math.floor(value / 1000000000000), step=step=step+1) + " triliun" + convertToBahasaIndonesiaText(value % 1000000000000, step=step=step+1);
     } else {
       return "Nilai terlalu besar untuk dikonversi.";
     }
   }
+
+  $('.sebutkan').each(function () {
+
+    var title = $($(this).data('angka')).prop('title');
+    $(this).text(title);
+
+  });
 })(jQuery)

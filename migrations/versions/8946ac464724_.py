@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 57a141fcf6bf
+Revision ID: 8946ac464724
 Revises: 
-Create Date: 2024-01-02 03:26:00.725686
+Create Date: 2024-01-14 01:35:11.944809
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '57a141fcf6bf'
+revision = '8946ac464724'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,6 +34,16 @@ def upgrade():
     sa.Column('keterangan', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('is_pemodal', sa.Boolean(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('sumber_dana',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('nama', sa.String(length=255), nullable=False),
+    sa.Column('jumlah', sa.Float(), nullable=False),
+    sa.Column('keterangan', sa.Text(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',
@@ -50,11 +60,11 @@ def upgrade():
     op.create_table('belanja',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nama', sa.String(length=255), nullable=False),
-    sa.Column('id_modal', sa.Integer(), nullable=False),
+    sa.Column('id_sumber_dana', sa.Integer(), nullable=False),
     sa.Column('keterangan', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['id_modal'], ['modal.id'], ),
+    sa.ForeignKeyConstraint(['id_sumber_dana'], ['sumber_dana.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('belanja_rinci',
@@ -103,6 +113,7 @@ def downgrade():
     op.drop_table('belanja_rinci')
     op.drop_table('belanja')
     op.drop_table('users')
+    op.drop_table('sumber_dana')
     op.drop_table('modal')
     op.drop_table('harga_jual')
     # ### end Alembic commands ###
