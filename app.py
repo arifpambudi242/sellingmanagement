@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
+from sqlalchemy import func, extract
 from flask_migrate import Migrate, upgrade, init
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, session
@@ -40,6 +40,7 @@ class Modal(db.Model):
     keterangan = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
+    is_pemodal = db.Column(db.Boolean, default=False)  # new column
     
     @property
     def total_jumlah(self):
@@ -49,14 +50,20 @@ class Modal(db.Model):
             .scalar()
         )
 
-    
     @property
     def persentase(self):
-        return self.jumlah / self.total_jumlah * 100
+        total_jumlah = (
+            db.session.query(func.sum(Modal.jumlah))
+            .select_from(Modal)
+            .filter(Modal.is_pemodal == True)
+            .scalar()
+        )
+        return self.jumlah / total_jumlah * 100 if self.is_pemodal else 0
     
     @property
     def jumlah_usd(self):
         return convertToUsd(self.jumlah)
+
     
 class SumberDana(db.Model):
     __tablename__ = 'sumber_dana'
@@ -75,16 +82,6 @@ class SumberDana(db.Model):
             .select_from(SumberDana)
             .scalar()
         )
-    
-    @property
-    def total_sisa(self):
-        total_jumlah_modal = (
-            db.session.query(func.sum(Modal.jumlah))
-            .select_from(Modal)
-            .scalar()
-        )
-        
-        return total_jumlah_modal - self.total_jumlah
 
     @property
     def jumlah_usd(self):
@@ -253,6 +250,26 @@ def getdata(table, column, value):
     global menus, tables
     return tables[table].query.filter_by(belanja_id=1).first()
 
+def total_sisa_modal():
+        total_jumlah_modal = (
+            db.session.query(func.sum(Modal.jumlah))
+            .select_from(Modal)
+            .scalar()
+        )
+        
+        # get the current year and month
+        now = datetime.now()
+        year = now.year
+        month = now.month
+        
+        return total_jumlah_modal - SumberDana().total_jumlah
+
+def jumlah_modal_investor():
+    return (
+            db.session.query(func.sum(Modal.jumlah))
+            .select_from(Modal)
+            .scalar()
+        )
 
 @app.context_processor
 def inject_data():
@@ -302,7 +319,7 @@ def inject_data():
             datas = None
             continue
 
-    return dict(tahun=tahun_str, active_title=active_title, datas=datas)
+    return dict(tahun=tahun_str, active_title=active_title, datas=datas, sisa_modal=total_sisa_modal, total_modal_investor=jumlah_modal_investor)
 
 @app.template_filter()
 def format_currency(value):
@@ -450,8 +467,9 @@ def add_modal():
     nama = request.form.get('nama')
     jumlah = request.form.get('jumlah')
     keterangan = request.form.get('keterangan')
+    is_pemodal = request.form.get('is_pemodal') == 'on'
     # Lakukan perhitungan otomatis sesuai logika bisnis Anda
-    modal = Modal(nama=nama, jumlah=jumlah, keterangan=keterangan)
+    modal = Modal(nama=nama, jumlah=jumlah, keterangan=keterangan, is_pemodal=is_pemodal)
     db.session.add(modal)
     db.session.commit()
     return jsonify({'status_code' : 200,'message': 'Data modal berhasil ditambahkan'}), 200
@@ -476,7 +494,7 @@ def edit_modal(modal_id):
 
         if modal:
             # If the modal with the given ID exists, return its data
-            return jsonify({'id': modal.id, 'nama': modal.nama, 'jumlah' : modal.jumlah, 'keterangan' : modal.keterangan})
+            return jsonify({'id': modal.id, 'nama': modal.nama, 'jumlah' : modal.jumlah, 'keterangan' : modal.keterangan, 'is_pemodal' : 'on' if modal.is_pemodal else 'off'})
         else:
             # If the modal with the given ID does not exist, return an error message
             return jsonify({'error': 'Modal not found'}), 404
@@ -490,6 +508,7 @@ def edit_modal(modal_id):
             modal.nama = updated_data.get('nama', modal.nama)
             modal.jumlah = updated_data.get('jumlah', modal.jumlah)
             modal.keterangan = updated_data.get('keterangan', modal.keterangan)
+            modal.is_pemodal = request.form.get('is_pemodal') == 'on'
 
             # Commit the changes to the database
             db.session.commit()
@@ -505,6 +524,58 @@ def edit_modal(modal_id):
 def sumber_dana():
     return render_template('sumber_dana.html', round=round)
 
+@app.route('/add_sumber_dana', methods=['POST'])
+def add_sumber_dana():
+    nama = request.form.get('nama')
+    jumlah = request.form.get('jumlah')
+    keterangan = request.form.get('keterangan')
+    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
+    sumber_dana = SumberDana(nama=nama, jumlah=jumlah, keterangan=keterangan)
+    db.session.add(sumber_dana)
+    db.session.commit()
+    return jsonify({'status_code' : 200,'message': 'Data sumber_dana berhasil ditambahkan'}), 200
+
+@app.route('/delete_sumber_dana/<int:sumber_dana_id>', methods=['POST'])
+def delete_sumber_dana(sumber_dana_id):
+    sumber_dana = SumberDana.query.get(sumber_dana_id)
+    if sumber_dana:
+        try:
+            db.session.delete(sumber_dana)
+            db.session.commit()
+            return jsonify({'status_code' : 200,'message': 'Data sumber_dana berhasil dihapus'}), 200
+        except Exception as e:
+            return jsonify({'status_code' : 502,'message': 'Data masih digunakan di belanja, anda tidak dapat menghapusnya'}), 200
+    else:
+        return jsonify({'status_code' : 404,'message': 'Data sumber_dana tidak ditemukan / sudah terhapus'}), 200
+
+@app.route('/edit_sumber_dana/<int:sumber_dana_id>', methods=['GET','POST'])
+def edit_sumber_dana(sumber_dana_id):
+    if not request.method == 'POST':
+        sumber_dana = SumberDana.query.get(sumber_dana_id)
+
+        if sumber_dana:
+            # If the sumber_dana with the given ID exists, return its data
+            return jsonify({'id': sumber_dana.id, 'nama': sumber_dana.nama, 'jumlah' : sumber_dana.jumlah, 'keterangan' : sumber_dana.keterangan})
+        else:
+            # If the sumber_dana with the given ID does not exist, return an error message
+            return jsonify({'error': 'Sumber dana not found'}), 404
+    else:
+        sumber_dana = SumberDana.query.get(sumber_dana_id)
+        if sumber_dana:
+            # Get the updated data from the request
+            updated_data = request.form
+
+            # Update the sumber_dana with the new data
+            sumber_dana.nama = updated_data.get('nama', sumber_dana.nama)
+            sumber_dana.jumlah = updated_data.get('jumlah', sumber_dana.jumlah)
+            sumber_dana.keterangan = updated_data.get('keterangan', sumber_dana.keterangan)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            return jsonify({'message': 'Sumber dana updated successfully'})
+        else:
+            return jsonify({'error': 'Sumber dana not found'}), 404
 
 # end sumber dana
 @app.route('/harga_jual')

@@ -854,8 +854,11 @@
         $('.modal-edit form').prop('action', action_link);
         $.each(response, function (key, value) {
           // Find the input element with the corresponding name
-          $(`#edit-${key}`).val(value);
-
+          if (key.includes('is_') && (value == 'on' || value == 'off')) {
+            $(`#edit-${key}`).prop('checked', value == 'on');
+          } else {
+            $(`#edit-${key}`).val(value);
+          }
         });
         $('.modal-edit').modal("show");
       },

@@ -5,6 +5,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 mb-4">
+                Total Modal: <span class="currency">{{ total_modal_investor() }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 mb-4">
                 <button class="btn btn-sm btn-success float-right" data-toggle="modal" data-target="#inputModal"><i
                         class="fas fa-plus"></i> Tambah</button>
             </div>
@@ -19,6 +24,7 @@
                             <th>Amount(IDR)</th>
                             <th>Amount(USD)</th>
                             <th>Percentage</th>
+                            <th>financier?</th>
                             <th>Description</th>
                             <th>Updated at</th>
                             <th>Action</th>
@@ -33,6 +39,7 @@
                             <td><span class="currency">{{data.jumlah}}</span></td>
                             <td>{{data.jumlah_usd}}</td>
                             <td>{{ round(data.persentase, 2) }}%</td>
+                            <td>{% if data.is_pemodal %} Yes {% else %} No {% endif %}</td>
                             <td>{{data.keterangan}}</td>
                             <td>{{data.updated_at}}</td>
                             <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit" data-link="{{ url_for('edit_modal', modal_id=data.id) }}"> <i class="fas fa-edit"></i> </button> 
@@ -48,6 +55,7 @@
                             <th>Amount(IDR)</th>
                             <th>Amount(USD)</th>
                             <th>Percentage</th>
+                            <th>financier?</th>
                             <th>Description</th>
                             <th>Updated at</th>
                             <th>Action</th>
@@ -88,6 +96,12 @@
                         <input type="text" class="form-control" id="keterangan" name="keterangan"
                             placeholder="Masukkan Keterangan" required>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="is_pemodal">Pemodal</label>
+                        <input type="checkbox" class="form-control" id="is_pemodal" name="is_pemodal">
+                    </div>
+
                     <button type="submit" class="btn btn-primary float-right" data-saved="0">Simpan</button>
                     <button type="button" class="btn btn-danger float-right" data-dismiss="modal" aria-label="Close">
                         Tutup
@@ -123,6 +137,10 @@
                         <label for="keterangan">Keterangan</label>
                         <input type="text" class="form-control" id="edit-keterangan" name="keterangan"
                             placeholder="Masukkan Keterangan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-is_pemodal">Pemodal</label>
+                        <input type="checkbox" class="form-control" id="edit-is_pemodal" name="is_pemodal">
                     </div>
                     <button type="submit" class="btn btn-primary float-right" data-saved="0">Simpan</button>
                     <button type="button" class="btn btn-danger float-right" data-dismiss="modal" aria-label="Close">

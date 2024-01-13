@@ -5,6 +5,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 mb-4">
+                Rincian belanja: <span class="currency">{{ sisa_modal() }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 mb-4">
                 <button class="btn btn-sm btn-success float-right" data-toggle="modal" data-target="#inputModal"><i
                         class="fas fa-plus"></i> Tambah</button>
             </div>
@@ -18,7 +23,6 @@
                             <th>Name</th>
                             <th>Amount(IDR)</th>
                             <th>Amount(USD)</th>
-                            <th>Percentage</th>
                             <th>Description</th>
                             <th>Updated at</th>
                             <th>Action</th>
@@ -32,11 +36,10 @@
                             </td>
                             <td><span class="currency">{{data.jumlah}}</span></td>
                             <td>{{data.jumlah_usd}}</td>
-                            <td>{{ round(data.persentase, 2) }}%</td>
                             <td>{{data.keterangan}}</td>
                             <td>{{data.updated_at}}</td>
-                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit" data-link="{{ url_for('edit_modal', modal_id=data.id) }}"> <i class="fas fa-edit"></i> </button> 
-                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete" data-link="{{ url_for('delete_modal', modal_id=data.id) }}" data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button></td>
+                            <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit" data-link="{{ url_for('edit_sumber_dana', sumber_dana_id=data.id) }}"> <i class="fas fa-edit"></i> </button> 
+                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete" data-link="{{ url_for('delete_sumber_dana', sumber_dana_id=data.id) }}" data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button></td>
                         </tr>
                         {% endfor %}
 
@@ -47,7 +50,6 @@
                             <th>Name</th>
                             <th>Amount(IDR)</th>
                             <th>Amount(USD)</th>
-                            <th>Percentage</th>
                             <th>Description</th>
                             <th>Updated at</th>
                             <th>Action</th>
@@ -60,7 +62,7 @@
     </div>
     <!-- /.container-fluid -->
 </div>
-<!-- Modal -->
+<!-- sumber_dana -->
 <div class="modal fade modal-input" id="inputModal" tabindex="-1" role="dialog" aria-labelledby="inputModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
@@ -72,7 +74,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/add_modal" , method="post">
+                <form action="/add_sumber_dana" , method="post">
                     <div class="form-group">
                         <label for="nama">Nama</label>
                         <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama"
@@ -108,7 +110,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/edit_modal" , method="post">
+                <form action="/edit_sumber_dana" , method="post">
                     <div class="form-group">
                         <label for="nama">Nama</label>
                         <input type="text" class="form-control" id="edit-nama" name="nama" placeholder="Masukkan Nama"
