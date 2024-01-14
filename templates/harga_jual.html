@@ -16,9 +16,9 @@
                         <tr>
                             <th>No</th>
                             <th>Name</th>
-                            <th>Expenditure Source</th>
-                            <th>Production Amount</th>
-                            <th>Production Date</th>
+                            <th>price(IDR)</th>
+                            <th>price(USD)</th>
+                            <th>Effective date</th>
                             <th>Description</th>
                             <th>Created at</th>
                             <th>Updated at</th>
@@ -26,35 +26,35 @@
                         </tr>
                     </thead>
                     <tbody>
-
-                        {% for data in datas.produksi %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>{{ data.nama }}</td>
-                                <td title="{{ data.belanja.belanja_rinci_list }}">{{ data.belanja.nama }}</td>
-                                <td>{{ round(data.jumlah_produksi) }}</td>
-                                <td>{{ data.tanggal_produksi.strftime("%d %b %Y") }}</td>
-                                <td>{{ data.keterangan }}</td>
-                                <td>{{ data.created_at }}</td>
-                                <td>{{ data.updated_at }}</td>
-                                <td>
-                                    <button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit"
-                                        data-link="{{ url_for('edit_produksi', produksi_id=data.id) }}">
-                                        <i class="fas fa-edit"></i> </button>
-                                    <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete"
-                                        data-link="{{ url_for('delete_produksi', produksi_id=data.id) }}"
-                                        data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button>
-                                </td>
-                            </tr>  
+                        {% for data in datas %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ data.nama }}</td>
+                            <td class="currency">{{ data.harga }}</td>
+                            <td>{{ data.harga_usd }}</td>
+                            <td>{{ data.tgl_berlaku.strftime("%d %b %Y") }}</td>
+                            <td>{{ data.keterangan }}</td>
+                            <td>{{ data.created_at }}</td>
+                            <td>{{ data.updated_at }}</td>
+                            <td>
+                                <button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit"
+                                data-link="{{ url_for('edit_harga_jual', harga_jual_id=data.id) }}">
+                                <i class="fas fa-edit"></i> </button>
+                                <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete"
+                                data-link="{{ url_for('delete_harga_jual', harga_jual_id=data.id) }}"
+                                data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button>
+                            </td>
+                        </tr>
                         {% endfor %}
+                        
                     </tbody>
                     <tfoot>
                         <tr>
                             <th>No</th>
                             <th>Name</th>
-                            <th>Expenditure Source</th>
-                            <th>Production Amount</th>
-                            <th>Production Date</th>
+                            <th>price(IDR)</th>
+                            <th>price(USD)</th>
+                            <th>Effective date</th>
                             <th>Description</th>
                             <th>Created at</th>
                             <th>Updated at</th>
@@ -68,41 +68,32 @@
     </div>
     <!-- /.container-fluid -->
 </div>
-<!-- Modal -->
+<!-- sumber_dana -->
 <div class="modal fade modal-input" id="inputModal" tabindex="-1" role="dialog" aria-labelledby="inputModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="inputModalLabel">Tambah Data Produksi</h5>
+                <h5 class="modal-title" id="inputModalLabel">Tambah Data Modal</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/add_produksi" , method="post">
+                <form action="/add_harga_jual" , method="post">
                     <div class="form-group">
                         <label for="nama">Nama</label>
                         <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama"
                             required>
                     </div>
                     <div class="form-group">
-                        <label for="belanja">Sumber Belanja</label>
-                        <select type="text" class="form-control" id="belanja" name="belanja" required>
-                            <option value=""> pilih belanja </option>
-                            {% for data in datas.belanja %}
-                            <option title="{{ data.belanja_rinci_list }}" value="{{ data.id }}">{{ data.nama }}</option>
-                            {% endfor %}
-                        </select>
+                        <label for="harga">Harga</label>
+                        <input type="number"   class="form-control currency" id="harga" name="harga"
+                            placeholder="Masukkan Harga" required>
                     </div>
                     <div class="form-group">
-                        <label for="jumlah_produksi">Jumlah Produksi</label>
-                        <input type="number" class="form-control" id="jumlah_produksi" name="jumlah_produksi" placeholder="Masukkan Angka"
-                            required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tanggal_produksi">Tanggal Produksi</label>
-                        <input type="date" class="form-control" id="tanggal_produksi" name="tanggal_produksi" placeholder="Masukkan Nama"
+                        <label for="tgl_berlaku">Tanggal Berlaku</label>
+                        <input type="date" class="form-control" id="tgl_berlaku" name="tgl_berlaku" placeholder="Masukkan Nama"
                             required value="{{ datetime.now().strftime('%Y-%m-%d') }}">
                     </div>
                     <div class="form-group">
@@ -124,35 +115,26 @@
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Data Produksi</h5>
+                <h5 class="modal-title" id="editModalLabel">Edit Data Modal</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/edit_produksi" , method="post">
+                <form action="/edit_harga_jual" , method="post">
                     <div class="form-group">
                         <label for="nama">Nama</label>
                         <input type="text" class="form-control" id="edit-nama" name="nama" placeholder="Masukkan Nama"
                             required>
                     </div>
                     <div class="form-group">
-                        <label for="belanja">Sumber Belanja</label>
-                        <select type="text" class="form-control" id="edit-belanja" name="belanja" required>
-                            <option value=""> pilih belanja </option>
-                            {% for data in datas.belanja %}
-                            <option title="{{ data.belanja_rinci_list }}" value="{{ data.id }}">{{ data.nama }}</option>
-                            {% endfor %}
-                        </select>
+                        <label for="harga">Harga</label>
+                        <input type="number"   class="form-control currency" id="edit-harga" name="harga"
+                            placeholder="Masukkan Harga" required>
                     </div>
                     <div class="form-group">
-                        <label for="jumlah_produksi">Jumlah Produksi</label>
-                        <input type="number" class="form-control" id="edit-jumlah_produksi" name="jumlah_produksi" placeholder="Masukkan Angka"
-                            required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tanggal_produksi">Tanggal Produksi</label>
-                        <input type="date" class="form-control" id="edit-tanggal_produksi" name="tanggal_produksi" placeholder="Masukkan Nama"
+                        <label for="tgl_berlaku">Tanggal Berlaku</label>
+                        <input type="date" class="form-control" id="edit-tgl_berlaku" name="tgl_berlaku" placeholder="Masukkan Nama"
                             required>
                     </div>
                     <div class="form-group">

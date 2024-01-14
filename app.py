@@ -182,6 +182,7 @@ class Produksi(db.Model):
 
 class HargaJual(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nama = db.Column(db.String(255), nullable=False)
     harga = db.Column(db.Float, nullable=False)
     tgl_berlaku = db.Column(db.Date, nullable=False)
     keterangan = db.Column(db.Text, nullable=True)
@@ -653,7 +654,61 @@ def edit_sumber_dana(sumber_dana_id):
 #harga jual
 @app.route('/harga_jual')
 def harga_jual():
-    return "Ini adalah halaman Harga Jual"
+    return render_template('harga_jual.html', datetime=datetime, round=round)
+
+@app.route('/add_harga_jual', methods=['POST'])
+def add_harga_jual():
+    nama = request.form.get('nama')
+    harga = request.form.get('harga')
+    tgl_berlaku = datetime.strptime(request.form.get('tgl_berlaku'), "%Y-%m-%d").date()
+    keterangan = request.form.get('keterangan')
+    # Lakukan perhitungan otomatis sesuai logika bisnis Anda
+    harga_jual = HargaJual(nama=nama, harga=harga, keterangan=keterangan, tgl_berlaku=tgl_berlaku)
+    db.session.add(harga_jual)
+    db.session.commit()
+    return jsonify({'status_code' : 200,'message': 'Data Harga Jual berhasil ditambahkan'}), 200
+
+@app.route('/delete_harga_jual/<int:harga_jual_id>', methods=['POST'])
+def delete_harga_jual(harga_jual_id):
+    harga_jual = HargaJual.query.get(harga_jual_id)
+    if harga_jual:
+        try:
+            db.session.delete(harga_jual)
+            db.session.commit()
+            return jsonify({'status_code' : 200,'message': 'Data Harga Jual berhasil dihapus'}), 200
+        except Exception as e:
+            return jsonify({'status_code' : 502,'message': 'Data masih digunakan di Harga Jual rinci, anda tidak dapat menghapusnya'}), 200
+    else:
+        return jsonify({'status_code' : 404,'message': 'Data Harga Jual tidak ditemukan / sudah terhapus'}), 200
+
+@app.route('/edit_harga_jual/<int:harga_jual_id>', methods=['GET','POST'])
+def edit_harga_jual(harga_jual_id):
+    if not request.method == 'POST':
+        harga_jual = HargaJual.query.get(harga_jual_id)
+        if harga_jual:
+            # If the harga_jual with the given ID exists, return its data
+            return jsonify({'id': harga_jual.id, 'nama': harga_jual.nama, 'keterangan' : harga_jual.keterangan, 'harga': harga_jual.harga, 'tgl_berlaku': harga_jual.tgl_berlaku.strftime('%Y-%m-%d')})
+        else:
+            # If the harga_jual with the given ID does not exist, return an error message
+            return jsonify({'error': 'harga_jual not found'}), 404
+    else:
+        harga_jual = HargaJual.query.get(harga_jual_id)
+        if harga_jual:
+            # Get the updated data from the request
+            updated_data = request.form
+
+            # Update the harga_jual with the new data
+            harga_jual.nama = updated_data.get('nama', harga_jual.nama)
+            harga_jual.harga = updated_data.get('harga', harga_jual.harga)
+            harga_jual.tgl_berlaku = datetime.strptime(request.form.get('tgl_berlaku'), "%Y-%m-%d").date()
+            harga_jual.keterangan = updated_data.get('keterangan', harga_jual.keterangan)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            return jsonify({'message': 'Harga Jual updated successfully'})
+        else:
+            return jsonify({'error': 'Harga not found'}), 404
 
 # end harga jual
 
