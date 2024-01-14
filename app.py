@@ -240,7 +240,7 @@ menus = {
 
 tables = {
         'index' : [Modal, Belanja, Produksi, HargaJual, Jual, BelanjaRinci],
-        'penjualan' : Jual,
+        'penjualan' : [HargaJual,Jual],
         'produksi' : [Produksi, Belanja],
         'belanja' : [SumberDana, Belanja],
         'belanja_rinci' : [Belanja,BelanjaRinci],
@@ -350,9 +350,12 @@ def favicon():
 
 
 
+# Penjualan
 @app.route('/penjualan')
 def penjualan():
-    return "Ini adalah halaman Penjualan"
+    return render_template('penjualan.html', round=round, datetime=datetime)
+
+# end penjualan
 
 # produksi
 @app.route('/produksi')
