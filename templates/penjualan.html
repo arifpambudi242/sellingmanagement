@@ -26,7 +26,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        
+
                     </tbody>
                     <tfoot>
                         <tr>
@@ -62,19 +62,25 @@
             <div class="modal-body">
                 <form action="/add_harga_jual" , method="post">
                     <div class="form-group">
-                        <label for="nama">Nama</label>
-                        <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama"
-                            required>
+                        <label for="harga">Produk</label>
+                        <select name="harga" id="harga" class="form-control">
+                            {% for harga in datas.hargajual %}
+                                <option value="{{harga.id}}" class="currency">{{ harga.nama }} - {{ harga.harga }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="harga">Harga</label>
-                        <input type="number"   class="form-control currency" id="harga" name="harga"
-                            placeholder="Masukkan Harga" required>
+                        <label for="produksi">Stock</label>
+                        <select name="produksi" id="produksi" class="form-control">
+                            {% for produksi in datas.produksi %}
+                                <option value="{{produksi.id}}">{{ produksi.nama }} - {{ produksi.jumlah_produksi }} sisa {{ produksi.sisa }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="tgl_berlaku">Tanggal Berlaku</label>
-                        <input type="date" class="form-control" id="tgl_berlaku" name="tgl_berlaku" placeholder="Masukkan Nama"
-                            required value="{{ datetime.now().strftime('%Y-%m-%d') }}">
+                        <label for="tgl_berlaku">Tanggal Terjual</label>
+                        <input type="date" class="form-control" id="tgl_berlaku" name="tgl_berlaku"
+                            placeholder="Masukkan Nama" required value="{{ datetime.now().strftime('%Y-%m-%d') }}">
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
@@ -101,25 +107,31 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/edit_harga_jual" , method="post">
+                <form action="/add_harga_jual" , method="post">
                     <div class="form-group">
-                        <label for="nama">Nama</label>
-                        <input type="text" class="form-control" id="edit-nama" name="nama" placeholder="Masukkan Nama"
-                            required>
+                        <label for="harga">Produk</label>
+                        <select name="harga" id="harga" class="form-control">
+                            {% for harga in datas.hargajual %}
+                                <option value="{{harga.id}}" class="currency">{{ harga.nama }} - {{ harga.harga }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="harga">Harga</label>
-                        <input type="number"   class="form-control currency" id="edit-harga" name="harga"
-                            placeholder="Masukkan Harga" required>
+                        <label for="produksi">Stock</label>
+                        <select name="produksi" id="produksi" class="form-control">
+                            {% for produksi in datas.produksi %}
+                                <option value="{{produksi.id}}">{{ produksi.nama }} - {{ produksi.jumlah_produksi }} sisa {{ produksi.sisa }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="tgl_berlaku">Tanggal Berlaku</label>
-                        <input type="date" class="form-control" id="edit-tgl_berlaku" name="tgl_berlaku" placeholder="Masukkan Nama"
-                            required>
+                        <label for="tgl_berlaku">Tanggal Terjual</label>
+                        <input type="date" class="form-control" id="tgl_berlaku" name="tgl_berlaku"
+                            placeholder="Masukkan Nama" required value="{{ datetime.now().strftime('%Y-%m-%d') }}">
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="edit-keterangan" name="keterangan"
+                        <input type="text" class="form-control" id="keterangan" name="keterangan"
                             placeholder="Masukkan Keterangan" required>
                     </div>
                     <button type="submit" class="btn btn-primary float-right" data-saved="0">Simpan</button>

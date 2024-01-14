@@ -179,6 +179,17 @@ class Produksi(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
     belanja = db.relationship('Belanja', backref=db.backref('Produksi', lazy=True))
+    
+    @property
+    def sisa(self):
+        total_laku = (
+            db.session.query(func.sum(Jual.jumlah_penjualan))
+            .select_from(Jual)
+            .filter(Jual.id_produksi == self.id)
+            .scalar()
+        )
+        
+        return self.jumlah_produksi - (total_laku if total_laku else 0)
 
 class HargaJual(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -240,7 +251,7 @@ menus = {
 
 tables = {
         'index' : [Modal, Belanja, Produksi, HargaJual, Jual, BelanjaRinci],
-        'penjualan' : [HargaJual,Jual],
+        'penjualan' : [HargaJual,Jual, Produksi],
         'produksi' : [Produksi, Belanja],
         'belanja' : [SumberDana, Belanja],
         'belanja_rinci' : [Belanja,BelanjaRinci],
@@ -325,9 +336,9 @@ def inject_data():
                         if 'belanja' in tab.__name__.lower():
                             datas[tab.__name__.lower()] = tab.query.get(int(last_url))
                         if 'belanjarinci' in tab.__name__.lower():
-                            datas[tab.__name__.lower()] = tab.query.filter_by(belanja_id=int(last_url)).all()
+                            datas[tab.__name__.lower()] = tab.query.filter_by(belanja_id=int(last_url)).order_by(tab.id.desc()).all()
                     except:
-                        datas[tab.__name__.lower()] = tab.query.all()
+                        datas[tab.__name__.lower()] = tab.query.order_by(tab.id.desc()).all()
                         
                 break
         else:
@@ -354,6 +365,8 @@ def favicon():
 @app.route('/penjualan')
 def penjualan():
     return render_template('penjualan.html', round=round, datetime=datetime)
+
+
 
 # end penjualan
 
