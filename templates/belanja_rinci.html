@@ -8,16 +8,16 @@
                 Rincian belanja: <b>{{ datas.belanja.nama }}</b> ({{ datas.belanja.keterangan }})
                 <br>
                 Sumber Dana:
-                <b>{{ datas.belanja.modal.nama }}</b>
+                <b>{{ datas.belanja.sumber_dana.nama }}</b>
                 <br>
                 Jumlah:
-                <b class="currency">{{ datas.belanja.modal.jumlah }}</b>
+                <b class="currency">{{ datas.belanja.sumber_dana.jumlah }}</b>
                 <br>
                 Total Belanja : 
                 <b class="currency">{{ datas.belanja.total_belanja }}</b>
                 <br>
                 Sisa:
-                <b class="currency">{{ datas.belanja.modal.sisa }}</b>
+                <b class="currency">{{ datas.belanja.sumber_dana.sisa }}</b>
                 <br>
                 <hr>
             </div>
@@ -110,16 +110,16 @@
             </div>
             <div class="modal-body">
                 Sumber Dana:
-                <b>{{ datas.belanja.modal.nama }}</b>
+                <b>{{ datas.belanja.sumber_dana.nama }}</b>
                 <br>
                 Jumlah:
-                <b class="currency">{{ datas.belanja.modal.jumlah }}</b>
+                <b class="currency">{{ datas.belanja.sumber_dana.jumlah }}</b>
                 <br>
                 Total Belanja : 
                 <b class="currency">{{ datas.belanja.total_belanja }}</b>
                 <br>
                 Sisa:
-                <b class="currency">{{ datas.belanja.modal.sisa }}</b>
+                <b class="currency">{{ datas.belanja.sumber_dana.sisa }}</b>
                 <br>
                 <hr>
                 <form action="{{ url_for('belanja_rinci', blj_id=datas.belanja.id) }}" method="post">
@@ -163,16 +163,16 @@
             </div>
             <div class="modal-body">
                 Sumber Dana:
-                <b>{{ datas.belanja.modal.nama }}</b>
+                <b>{{ datas.belanja.sumber_dana.nama }}</b>
                 <br>
                 Jumlah:
-                <b class="currency">{{ datas.belanja.modal.jumlah }}</b>
+                <b class="currency">{{ datas.belanja.sumber_dana.jumlah }}</b>
                 <br>
                 Total Belanja : 
                 <b class="currency">{{ datas.belanja.total_belanja }}</b>
                 <br>
                 Sisa:
-                <b class="currency">{{ datas.belanja.modal.sisa }}</b>
+                <b class="currency">{{ datas.belanja.sumber_dana.sisa }}</b>
                 <br>
                 <hr>
                 <form action="{{ url_for('edit_belanja_rinci', belanja_rinci_id=datas.belanja.id) }}" method="post">

@@ -82,10 +82,26 @@ class SumberDana(db.Model):
             .select_from(SumberDana)
             .scalar()
         )
+    
+    @property
+    def sisa(self):
+        total_belanja = (
+            db.session.query(func.sum(BelanjaRinci.jumlah * BelanjaRinci.harga))
+            .select_from(Belanja)
+            .join(BelanjaRinci, BelanjaRinci.belanja_id == Belanja.id)
+            .filter(Belanja.id_sumber_dana == self.id)
+            .scalar()
+        )
+        
+        return self.jumlah - (total_belanja if total_belanja else 0)
 
     @property
     def jumlah_usd(self):
         return convertToUsd(self.jumlah)
+    
+    @property
+    def sisa_usd(self):
+        return convertToUsd(self.sisa)
 
 class Belanja(db.Model):
     __tablename__ = 'belanja'
@@ -121,7 +137,7 @@ class Belanja(db.Model):
             .all()
         )
         
-        return ', '.join([rincian.nama_barang for rincian in rincians])
+        return ', '.join([': Rp. '.join([rincian.nama_barang, str(rincian.jumlah * rincian.harga)]) for rincian in rincians])
     
     
 
@@ -223,7 +239,7 @@ tables = {
         'index' : [Modal, Belanja, Produksi, HargaJual, Jual, BelanjaRinci],
         'penjualan' : Jual,
         'produksi' : [Produksi, Belanja],
-        'belanja' : [SumberDana,Belanja],
+        'belanja' : [SumberDana, Belanja],
         'belanja_rinci' : [Belanja,BelanjaRinci],
         'modal' : Modal,
         'sumber_dana' : SumberDana,
@@ -347,8 +363,8 @@ def belanja():
 def add_belanja():
     nama = request.form.get('nama')
     keterangan = request.form.get('keterangan')
-    id_modal = request.form.get('sumber_dana')
-    belanja = Belanja(nama=nama, keterangan=keterangan, id_modal=id_modal)
+    id_sumber_dana = request.form.get('sumber_dana')
+    belanja = Belanja(nama=nama, keterangan=keterangan, id_sumber_dana=id_sumber_dana)
     db.session.add(belanja)
     db.session.commit()
     return jsonify({'status_code' : 200,'message': 'Data Belanja berhasil ditambahkan'}), 200
