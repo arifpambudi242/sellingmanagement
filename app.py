@@ -1,3 +1,4 @@
+from time import strftime
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, extract
@@ -169,6 +170,7 @@ class BelanjaRinci(db.Model):
     
 class Produksi(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nama = db.Column(db.String(255), nullable=False)
     id_belanja = db.Column(db.Integer, db.ForeignKey('belanja.id'), nullable=False)
     jumlah_produksi = db.Column(db.Float, nullable=False)
     tanggal_produksi = db.Column(db.Date, nullable=False)
@@ -351,9 +353,67 @@ def favicon():
 def penjualan():
     return "Ini adalah halaman Penjualan"
 
+# produksi
 @app.route('/produksi')
 def produksi():
-    return render_template('produksi.html')
+    return render_template('produksi.html', strftime=strftime, round=round, datetime=datetime)
+
+@app.route('/add_produksi', methods=['POST'])
+def add_produksi():
+    nama = request.form.get('nama')
+    keterangan = request.form.get('keterangan')
+    jumlah_produksi = request.form.get('jumlah_produksi')
+    tanggal_produksi = datetime.strptime(request.form.get('tanggal_produksi'), "%Y-%m-%d").date()  
+    id_belanja = request.form.get('belanja')
+    produksi = Produksi(nama=nama, keterangan=keterangan, id_belanja=id_belanja, jumlah_produksi=jumlah_produksi, tanggal_produksi=tanggal_produksi)
+    db.session.add(produksi)
+    db.session.commit()
+    return jsonify({'status_code' : 200,'message': 'Data produksi berhasil ditambahkan'}), 200
+
+@app.route('/delete_produksi/<int:produksi_id>', methods=['POST'])
+def delete_produksi(produksi_id):
+    produksi = Produksi.query.get(produksi_id)
+    if produksi:
+        try:
+            db.session.delete(produksi)
+            db.session.commit()
+            return jsonify({'status_code' : 200,'message': 'Data produksi berhasil dihapus'}), 200
+        except Exception as e:
+            return jsonify({'status_code' : 502,'message': 'Data masih digunakan di produksi rinci, anda tidak dapat menghapusnya'}), 200
+    else:
+        return jsonify({'status_code' : 404,'message': 'Data produksi tidak ditemukan / sudah terhapus'}), 200
+
+@app.route('/edit_produksi/<int:produksi_id>', methods=['GET','POST'])
+def edit_produksi(produksi_id):
+    if not request.method == 'POST':
+        produksi = Produksi.query.get(produksi_id)
+        if produksi:
+            # If the produksi with the given ID exists, return its data
+            return jsonify({'id': produksi.id, 'nama': produksi.nama, 'keterangan' : produksi.keterangan, 'belanja' : produksi.id_belanja, 'jumlah_produksi': produksi.jumlah_produksi, 'tanggal_produksi': produksi.tanggal_produksi.strftime('%Y-%m-%d')})
+        else:
+            # If the produksi with the given ID does not exist, return an error message
+            return jsonify({'error': 'produksi not found'}), 404
+    else:
+        produksi = Produksi.query.get(produksi_id)
+        if produksi:
+            # Get the updated data from the request
+            updated_data = request.form
+
+            # Update the produksi with the new data
+            produksi.nama = updated_data.get('nama', produksi.nama)
+            produksi.jumlah_produksi = updated_data.get('jumlah_produksi', produksi.jumlah_produksi)
+            produksi.tanggal_produksi = datetime.strptime(request.form.get('tanggal_produksi'), "%Y-%m-%d").date()
+            produksi.keterangan = updated_data.get('keterangan', produksi.keterangan)
+            produksi.id_belanja = updated_data.get('belanja', produksi.id_belanja)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            return jsonify({'message': 'produksi updated successfully'})
+        else:
+            return jsonify({'error': 'produksi not found'}), 404
+# end produksi
+
 # belanja
 @app.route('/belanja')
 def belanja():
@@ -590,10 +650,12 @@ def edit_sumber_dana(sumber_dana_id):
             return jsonify({'error': 'Sumber dana not found'}), 404
 
 # end sumber dana
+#harga jual
 @app.route('/harga_jual')
 def harga_jual():
     return "Ini adalah halaman Harga Jual"
 
+# end harga jual
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT,debug=DEBUG)
