@@ -366,8 +366,74 @@ def favicon():
 def penjualan():
     return render_template('penjualan.html', round=round, datetime=datetime)
 
+@app.route('/add_penjualan', methods=['POST'])
+def add_penjualan():
+    id_produksi = request.form.get('produksi')
+    id_harga = request.form.get('harga')
+    keterangan = request.form.get('keterangan')
+    jumlah_penjualan = request.form.get('jumlah_penjualan')
+    tanggal_penjualan = datetime.strptime(request.form.get('tanggal_penjualan'), "%Y-%m-%d").date() 
+    penjualan = Jual(keterangan=keterangan, id_produksi=id_produksi, id_harga=id_harga,jumlah_penjualan=jumlah_penjualan, tanggal_penjualan=tanggal_penjualan)
+    db.session.add(penjualan)
+    db.session.commit()
+    return jsonify({'status_code' : 200,'message': 'Data penjualan berhasil ditambahkan'}), 200
 
+@app.route('/delete_penjualan/<int:penjualan_id>', methods=['POST'])
+def delete_penjualan(penjualan_id):
+    penjualan = Jual.query.get(penjualan_id)
+    if penjualan:
+        try:
+            db.session.delete(penjualan)
+            db.session.commit()
+            return jsonify({'status_code' : 200,'message': 'Data penjualan berhasil dihapus'}), 200
+        except Exception as e:
+            return jsonify({'status_code' : 502,'message': 'Data masih digunakan di penjualan rinci, anda tidak dapat menghapusnya'}), 200
+    else:
+        return jsonify({'status_code' : 404,'message': 'Data penjualan tidak ditemukan / sudah terhapus'}), 200
+    
+@app.route('/edit_penjualan/<int:penjualan_id>', methods=['GET','POST'])
+def edit_penjualan(penjualan_id):
+    if not request.method == 'POST':
+        penjualan = Jual.query.get(penjualan_id)
+        if penjualan:
+            # If the penjualan with the given ID exists, return its data
+            return jsonify({'id': penjualan.id, 'id_produksi': penjualan.id_produksi, 'id_harga': penjualan.id_harga, 'keterangan' : penjualan.keterangan, 'jumlah_penjualan': penjualan.jumlah_penjualan, 'tanggal_penjualan': penjualan.tanggal_penjualan.strftime('%Y-%m-%d')})
+        else:
+            # If the penjualan with the given ID does not exist, return an error message
+            return jsonify({'error': 'penjualan not found'}), 404
+    else:
+        penjualan = Jual.query.get(penjualan_id)
+        if penjualan:
+            # Get the updated data from the request
+            updated_data = request.form
 
+            # Update the penjualan with the new data
+            penjualan.id_produksi = updated_data.get('produksi')
+            penjualan.id_harga = updated_data.get('harga')
+            penjualan.keterangan = updated_data.get('keterangan')
+            penjualan.jumlah_penjualan = updated_data.get('jumlah_penjualan')
+            penjualan.tanggal_penjualan = datetime.strptime(request.form.get('tanggal_penjualan'), "%Y-%m-%d").date()
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            return jsonify({'message': 'penjualan updated successfully'})
+        else:
+            return jsonify({'error': 'penjualan not found'}), 404
+
+@app.route('/update_jumlah_penjualan/<int:penjualan_id>', methods=['POST'])
+def update_jumlah_penjualan(penjualan_id):
+    if request.method == 'POST':
+        penjualan = Jual.query.get(penjualan_id)
+        
+        if penjualan:
+            penjualan.jumlah_penjualan = request.form.get('jumlah')
+        
+            db.session.commit()
+            return jsonify({'message': 'jumlah updated successfully'})
+        else:
+            return jsonify({'error': 'Gagal tambah jumlah'}), 404
+            
 # end penjualan
 
 # produksi

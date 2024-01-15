@@ -741,7 +741,8 @@
         title: 'Laporan ' + doc_title + ' per ' + current_date(),
         exportOptions: {
           columns: ':not(:nth-last-child(-n+1))'
-        }
+        },
+        
       },
       {
         extend: 'excel',
@@ -749,7 +750,8 @@
         title: 'Laporan ' + doc_title + ' per ' + current_date(),
         exportOptions: {
           columns: ':not(:nth-last-child(-n+1))'
-        }
+        },
+        
       },
       {
         extend: 'pdf',
@@ -757,7 +759,8 @@
         title: 'Laporan ' + doc_title + ' per ' + current_date(),
         exportOptions: {
           columns: ':not(:nth-last-child(-n+1))'
-        }
+        },
+        
       },
       {
         extend: 'print',
@@ -765,7 +768,8 @@
         title: 'Laporan ' + doc_title + ' per ' + current_date(),
         exportOptions: {
           columns: ':not(:nth-last-child(-n+1))'
-        }
+        },
+        
       }
     ]
   }).buttons().container().appendTo('#pretty-table_wrapper .col-md-6:eq(0)');
@@ -940,6 +944,35 @@
 
 
   // Add blur event listener to remove the span
+
+  $('.update_input').submit(function (event) {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    if (confirm('Yakin akan menyimpan?')) {
+      // Serialize the form data
+      var formData = $(this).serialize();
+
+      // Send an AJAX request to the server
+      $.ajax({
+        type: 'POST',
+        url: $(this).prop('action'),
+        data: formData,
+        success: function (response) {
+          // Handle the success response
+          $(':input').val('');
+          toastr.success('Data berhasil ditambahkan');
+          $('table').load(window.location.href + ' table');
+          window.location.reload();
+        },
+        error: function (error) {
+          // Handle the error response
+          console.error('Error submitting data:', error);
+          // You can perform additional error handling here if needed
+        }
+      });
+    }
+  });
 
   // Function to format currency
   function formatCurrency(value) {

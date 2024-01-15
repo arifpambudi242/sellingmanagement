@@ -18,7 +18,9 @@
                             <th>Name</th>
                             <th>price(IDR)</th>
                             <th>price(USD)</th>
-                            <th>Effective date</th>
+                            <th>Amount</th>
+                            <th>Sisa</th>
+                            <th>Selling date</th>
                             <th>Description</th>
                             <th>Created at</th>
                             <th>Updated at</th>
@@ -27,6 +29,29 @@
                     </thead>
                     <tbody>
 
+                        {% for data in datas.jual %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ data.harga_jual.nama }}</td>
+                                <td class="currency">{{ data.harga_jual.harga }}</td>
+                                <td>{{ data.harga_jual.harga_usd }}</td>
+                                <td><form method="POST" class="update_input" action="{{ url_for('update_jumlah_penjualan', penjualan_id=data.id) }}"><input class="form-control" type="number" name="jumlah" value="{{ round(data.jumlah_penjualan) }}"></form></td>
+                                <td>{{ data.produksi.sisa }}</td>
+                                <td>{{ data.tanggal_penjualan }}</td>
+                                <td>{{ data.keterangan }}</td>
+                                <td>{{ data.created_at }}</td>
+                                <td>{{ data.updated_at }}</td>
+                                <td>
+                                    <button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit"
+                                        data-link="{{ url_for('edit_penjualan', penjualan_id=data.id) }}">
+                                        <i class="fas fa-edit"></i> </button>
+                                    <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete"
+                                        data-link="{{ url_for('delete_penjualan', penjualan_id=data.id) }}"
+                                        data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
                     </tbody>
                     <tfoot>
                         <tr>
@@ -34,7 +59,9 @@
                             <th>Name</th>
                             <th>price(IDR)</th>
                             <th>price(USD)</th>
-                            <th>Effective date</th>
+                            <th>Amount</th>
+                            <th>Sisa</th>
+                            <th>Selling date</th>
                             <th>Description</th>
                             <th>Created at</th>
                             <th>Updated at</th>
@@ -54,15 +81,15 @@
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="inputModalLabel">Tambah Data Modal</h5>
+                <h5 class="modal-title" id="inputModalLabel">Tambah Data Penjualan</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/add_harga_jual" , method="post">
+                <form action="/add_penjualan" , method="post">
                     <div class="form-group">
-                        <label for="harga">Produk</label>
+                        <label for="harga">Harga</label>
                         <select name="harga" id="harga" class="form-control">
                             {% for harga in datas.hargajual %}
                                 <option value="{{harga.id}}" class="currency">{{ harga.nama }} - {{ harga.harga }}</option>
@@ -78,14 +105,18 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="tgl_berlaku">Tanggal Terjual</label>
-                        <input type="date" class="form-control" id="tgl_berlaku" name="tgl_berlaku"
-                            placeholder="Masukkan Nama" required value="{{ datetime.now().strftime('%Y-%m-%d') }}">
+                        <label for="jumlah_penjualan">Jumlah Penjualan</label>
+                        <input class="form-control" type="number" id="jumlah_penjualan" name="jumlah_penjualan">
+                    </div>
+                    <div class="form-group">
+                        <label for="tanggal_penjualan">Tanggal Terjual</label>
+                        <input type="date" class="form-control" id="tanggal_penjualan" name="tanggal_penjualan"
+                        placeholder="Masukkan Nama" required value="{{ datetime.now().strftime('%Y-%m-%d') }}">
                     </div>
                     <div class="form-group">
                         <label for="keterangan">Keterangan</label>
                         <input type="text" class="form-control" id="keterangan" name="keterangan"
-                            placeholder="Masukkan Keterangan" required>
+                        placeholder="Masukkan Keterangan" required>
                     </div>
                     <button type="submit" class="btn btn-primary float-right" data-saved="0">Simpan</button>
                     <button type="button" class="btn btn-danger float-right" data-dismiss="modal" aria-label="Close">
@@ -97,41 +128,45 @@
     </div>
 </div>
 <div class="modal fade modal-edit" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Data Modal</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="/add_harga_jual" , method="post">
-                    <div class="form-group">
-                        <label for="harga">Produk</label>
-                        <select name="harga" id="harga" class="form-control">
-                            {% for harga in datas.hargajual %}
-                                <option value="{{harga.id}}" class="currency">{{ harga.nama }} - {{ harga.harga }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="produksi">Stock</label>
-                        <select name="produksi" id="produksi" class="form-control">
-                            {% for produksi in datas.produksi %}
-                                <option value="{{produksi.id}}">{{ produksi.nama }} - {{ produksi.jumlah_produksi }} sisa {{ produksi.sisa }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="tgl_berlaku">Tanggal Terjual</label>
-                        <input type="date" class="form-control" id="tgl_berlaku" name="tgl_berlaku"
-                            placeholder="Masukkan Nama" required value="{{ datetime.now().strftime('%Y-%m-%d') }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="keterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="keterangan" name="keterangan"
+aria-hidden="true">
+<div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">Edit Data Penjualan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form action="/add_harga_jual" , method="post">
+                <div class="form-group">
+                    <label for="harga">Harga</label>
+                    <select name="harga" id="edit-harga" class="form-control">
+                        {% for harga in datas.hargajual %}
+                        <option value="{{harga.id}}" class="currency">{{ harga.nama }} - {{ harga.harga }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="produksi">Stock</label>
+                    <select name="produksi" id="edit-produksi" class="form-control">
+                        {% for produksi in datas.produksi %}
+                        <option value="{{produksi.id}}">{{ produksi.nama }} - {{ produksi.jumlah_produksi }} sisa {{ produksi.sisa }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="jumlah_penjualan">Jumlah Penjualan</label>
+                    <input class="form-control" type="number" id="edit-jumlah_penjualan" name="jumlah_penjualan">
+                </div>
+                <div class="form-group">
+                    <label for="tanggal_penjualan">Tanggal Terjual</label>
+                    <input type="date" class="form-control" id="edit-tanggal_penjualan" name="tanggal_penjualan"
+                    placeholder="Masukkan Nama" required>
+                </div>
+                <div class="form-group">
+                    <label for="keterangan">Keterangan</label>
+                    <input type="text" class="form-control" id="edit-keterangan" name="keterangan"
                             placeholder="Masukkan Keterangan" required>
                     </div>
                     <button type="submit" class="btn btn-primary float-right" data-saved="0">Simpan</button>
