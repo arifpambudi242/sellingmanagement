@@ -504,7 +504,7 @@ def edit_produksi(produksi_id):
 # belanja
 @app.route('/belanja')
 def belanja():
-    return render_template('belanja.html')
+    return render_template('belanja.html', round=round, datetime=datetime)
 
 @app.route('/add_belanja', methods=['POST'])
 def add_belanja():
@@ -535,7 +535,7 @@ def edit_belanja(belanja_id):
         belanja = Belanja.query.get(belanja_id)
         if belanja:
             # If the belanja with the given ID exists, return its data
-            return jsonify({'id': belanja.id, 'nama': belanja.nama, 'keterangan' : belanja.keterangan, 'sumber_dana' : belanja.id_modal})
+            return jsonify({'id': belanja.id, 'nama': belanja.nama, 'keterangan' : belanja.keterangan, 'sumber_dana' : belanja.id_sumber_dana})
         else:
             # If the belanja with the given ID does not exist, return an error message
             return jsonify({'error': 'belanja not found'}), 404
@@ -548,7 +548,7 @@ def edit_belanja(belanja_id):
             # Update the belanja with the new data
             belanja.nama = updated_data.get('nama', belanja.nama)
             belanja.keterangan = updated_data.get('keterangan', belanja.keterangan)
-            belanja.id_modal = updated_data.get('sumber_dana', belanja.id_modal)
+            belanja.id_sumber_dana = updated_data.get('sumber_dana', belanja.id_sumber_dana)
 
             # Commit the changes to the database
             db.session.commit()

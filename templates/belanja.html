@@ -35,13 +35,13 @@
                                 {{data.sumber_dana.nama}}
                             </td>
                             <td><span class="currency">{{data.total_belanja}}</span>(${{data.total_belanja_usd}})</td>
-                            <td><span class="currency">{{data.sumber_dana.sisa}}</span>(${{data.sumber_dana.sisa_usd}})</td>
+                            <td class="{% if round(data.sumber_dana.sisa) <= 0 %} text-danger {% else %} text-success {% endif %}"><span class="currency">{{data.sumber_dana.sisa}}</span>(${{data.sumber_dana.sisa_usd}})</td>
                             <td>{{data.keterangan}}</td>
                             <td>{{data.created_at}}</td>
                             <td>{{data.updated_at}}</td>
                             <td><button type="button" title="Edit Data" class="btn-sm btn-primary btn-edit" data-link="{{ url_for('edit_belanja', belanja_id=data.id) }}"> <i class="fas fa-edit"></i> </button> 
                                 <button type="button" title="Hapus Data" class="btn-sm btn-danger btn-delete" data-link="{{ url_for('delete_belanja', belanja_id=data.id) }}" data-id="{{ data.id }}"> <i class="fas fa-eraser"></i> </button>
-                                <button title="Rinci belanja" class="btn-sm btn-success btn-detailed" onclick="location.href = '{{ url_for('belanja_rinci', blj_id=data.id) }}'"> <i class="fas fa-eye"></i> </> </td>
+                                <button title="Rinci belanja" class="btn-sm btn-success btn-detailed" onclick="location.href = '{{ url_for("belanja_rinci", blj_id=data.id) }}'"> <i class="fas fa-list"></i> </> </td>
                                 </tr>
                                 {% endfor %}
                                 
