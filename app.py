@@ -336,9 +336,9 @@ def inject_data():
                         if 'belanja' in tab.__name__.lower():
                             datas[tab.__name__.lower()] = tab.query.get(int(last_url))
                         if 'belanjarinci' in tab.__name__.lower():
-                            datas[tab.__name__.lower()] = tab.query.filter_by(belanja_id=int(last_url)).order_by(tab.id.desc()).all()
+                            datas[tab.__name__.lower()] = tab.query.filter_by(belanja_id=int(last_url)).order_by(tab.updated_at.desc()).all()
                     except:
-                        datas[tab.__name__.lower()] = tab.query.order_by(tab.id.desc()).all()
+                        datas[tab.__name__.lower()] = tab.query.order_by(tab.updated_at.desc()).all()
                         
                 break
         else:
@@ -427,10 +427,14 @@ def update_jumlah_penjualan(penjualan_id):
         penjualan = Jual.query.get(penjualan_id)
         
         if penjualan:
-            penjualan.jumlah_penjualan = request.form.get('jumlah')
-        
-            db.session.commit()
-            return jsonify({'message': 'jumlah updated successfully'})
+            jumlah_penjualan = int(request.form.get('jumlah'))
+            if (jumlah_penjualan <= penjualan.produksi.jumlah_produksi):    
+                penjualan.jumlah_penjualan = jumlah_penjualan
+            
+                db.session.commit()
+                return jsonify({'message': 'jumlah updated successfully'}), 200
+            else:
+                return jsonify({'message': 'jumlah melebihi stock!'}), 404
         else:
             return jsonify({'error': 'Gagal tambah jumlah'}), 404
             

@@ -967,7 +967,10 @@
         },
         error: function (error) {
           // Handle the error response
-          console.error('Error submitting data:', error);
+          toastr.error('Melebihi Jumlah stock!');
+          setTimeout(function(){
+            window.location.reload();
+          }, 2500);
           // You can perform additional error handling here if needed
         }
       });
