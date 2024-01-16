@@ -963,7 +963,9 @@
           $(':input').val('');
           toastr.success('Data berhasil ditambahkan');
           $('table').load(window.location.href + ' table');
-          window.location.reload();
+          setTimeout(function(){
+            window.location.reload();
+          }, 2500);
         },
         error: function (error) {
           // Handle the error response
