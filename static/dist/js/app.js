@@ -970,9 +970,6 @@
         error: function (error) {
           // Handle the error response
           toastr.error('Melebihi Jumlah stock!');
-          setTimeout(function(){
-            window.location.reload();
-          }, 2500);
           // You can perform additional error handling here if needed
         }
       });

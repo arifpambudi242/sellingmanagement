@@ -35,7 +35,7 @@
                                 <td>{{ data.harga_jual.nama }}</td>
                                 <td class="currency">{{ data.harga_jual.harga }}</td>
                                 <td>{{ data.harga_jual.harga_usd }}</td>
-                                <td><form method="POST" class="update_input" action="{{ url_for('update_jumlah_penjualan', penjualan_id=data.id) }}"><input class="form-control" type="number" name="jumlah" value="{{ round(data.jumlah_penjualan) }}"></form></td>
+                                <td>{{ round(data.jumlah_penjualan) }}<form method="POST" class="update_input" action="{{ url_for('update_jumlah_penjualan', penjualan_id=data.id) }}"><input class="form-control" type="number" style="max-width: 60px;" name="jumlah" value="{{ round(data.jumlah_penjualan) }}"></form></td>
                                 <td class="{% if round(data.produksi.sisa) < 0 %} text-danger {% endif %}">{{ round(data.produksi.sisa) }}</td>
                                 <td>{{ data.tanggal_penjualan }}</td>
                                 <td>{{ data.keterangan }}</td>
