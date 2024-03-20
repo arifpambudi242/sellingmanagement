@@ -217,6 +217,15 @@ class Jual(db.Model):
 
     produksi = db.relationship('Produksi', backref=db.backref('Jual', lazy=True))
     harga_jual = db.relationship('HargaJual', backref=db.backref('Jual', lazy=True))
+    
+    # jumlah penjualan * harga_jual.harga 
+    @property
+    def total_penjualan(self):
+        return self.jumlah_penjualan * self.harga_jual.harga
+    
+    @property
+    def total_penjualan_usd(self):
+        return convertToUsd(self.total_penjualan)
 
 
 
